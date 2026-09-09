@@ -1,0 +1,4 @@
+# Datos descargados y resultados derivados; no versionar ficheros pesados.
+/datos_espaciales/*
+!/datos_espaciales/.gitkeep
+/work/
