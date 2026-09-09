@@ -1,0 +1,15 @@
+-- ADAPTADOR DE CARGA: no crea ni altera objetos GC_*_ES.
+--
+-- Este fichero debe completarse después de ejecutar los scripts oficiales de
+-- Oracle Geocoder y revisar sus columnas reales. La documentación Oracle y las
+-- tablas STG_GC_*_ES definen el contrato funcional, pero no sustituyen el DDL.
+--
+-- Ejemplo de procedimiento seguro:
+-- 1. Validar STG con 03_validate_staging.sql.
+-- 2. Mapear explícitamente las columnas oficiales de GC_ADDRESS_POINT_ES,
+--    GC_ROAD_ES, GC_ROAD_SEGMENT_ES, GC_AREA_ES, GC_POSTAL_CODE_ES y GC_POI_ES.
+-- 3. Ejecutar MERGE/INSERT en una ventana de carga controlada.
+-- 4. Ejecutar los procedimientos oficiales de mantenimiento/indexación.
+--
+-- No se incluyen INSERT genéricos porque los nombres y columnas de las tablas
+-- oficiales dependen de la versión de Oracle y del proveedor del geocoder.
