@@ -16,6 +16,9 @@ Fuentes originales
       Inventario y control de calidad
              |
              v
+      Conversión de todas las capas a Shapefile
+             |
+             v
       Tablas o ficheros staging
              |
              v
@@ -33,7 +36,8 @@ Fuentes originales
 
 ## 2. Fase 1: inventario de las fuentes
 
-Descomprimir los paquetes en directorios separados y registrar:
+Descomprimir los paquetes en directorios separados, convertir las capas a
+Shapefile mediante `scripts/00_convert_sources_to_shapefile.sh` y registrar:
 
 - Sistema de referencia.
 - Número de registros.

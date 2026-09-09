@@ -9,6 +9,7 @@ carga de cada instalación.
 
 ```bash
 ./scripts/01_prepare_sources.sh ./work
+./scripts/00_convert_sources_to_shapefile.sh ./work
 sqlplus usuario/password@servicio @sql/01_create_staging.sql
 ./scripts/02_load_staging.sh ./work usuario/password@servicio GEOCODER
 sqlplus usuario/password@servicio @sql/02_transform_staging.sql
@@ -17,8 +18,11 @@ sqlplus usuario/password@servicio @sql/04_transform_postal_code.sql
 ```
 
 `01_prepare_sources.sh` descomprime los tres paquetes y genera un inventario
-GDAL. `02_load_staging.sh` carga CartoCiudad, Geofabrik y las capas prioritarias
-de Redes de Transporte mediante el driver OCI de GDAL.
+GDAL. `00_convert_sources_to_shapefile.sh` convierte todas las capas de
+GeoPackage y conserva las capas que ya son Shapefile en un directorio común,
+reproyectándolas a EPSG:4326. `02_load_staging.sh` carga desde ese directorio
+unificado CartoCiudad, Geofabrik y las capas prioritarias de Redes de Transporte
+mediante el driver OCI de GDAL.
 
 `02_transform_staging.sql` normaliza los campos conocidos de CartoCiudad y OSM
 en tablas canónicas `STG_GC_*_ES`. Las capas de Redes de Transporte se cargan
