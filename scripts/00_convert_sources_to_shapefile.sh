@@ -47,7 +47,7 @@ convert_geopackages() {
 
     mapfile -t layers < <(
       ogrinfo -ro "$source" 2>/dev/null |
-        sed -n 's/^ [0-9]*: \([^ (]*\).*/\1/p'
+        sed -n 's/^[[:space:]]*[0-9][0-9]*: \([^ (]*\).*/\1/p'
     )
 
     [[ ${#layers[@]} -gt 0 ]] || {
