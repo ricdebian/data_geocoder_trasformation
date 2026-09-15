@@ -20,3 +20,14 @@
 *.sqlite3
 *.tif
 *.tiff
+
+# Paquetes comprimidos y archivos descargados; no versionar binarios.
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.bz2
+*.xz
