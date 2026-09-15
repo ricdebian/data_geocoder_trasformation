@@ -2,3 +2,21 @@
 /datos_espaciales/*
 !/datos_espaciales/.gitkeep
 /work/
+
+# Formatos espaciales y sus archivos auxiliares; no versionar datos geográficos.
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.qpj
+*.gpkg
+*.geojson
+*.pbf
+*.kml
+*.kmz
+*.gdb/
+*.sqlite
+*.sqlite3
+*.tif
+*.tiff
