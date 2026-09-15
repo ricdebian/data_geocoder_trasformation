@@ -119,6 +119,63 @@ También deben documentarse las claves, restricciones, índices y columnas
 obligatorias que exponga la instalación oficial. El modelo puede variar según
 la versión de Oracle y el proveedor de datos.
 
+### 2.1. Procedimiento para crear los objetos oficiales y los perfiles de idioma
+
+La guía operativa detallada se encuentra en
+[`objetos_gc_oracle.md`](objetos_gc_oracle.md).
+
+Los objetos `GC_*_ES` y los perfiles de lenguaje no deben crearse copiando el
+modelo de staging ni mediante un `CREATE TABLE` aproximado. Debe seguirse este
+orden:
+
+1. Instalar o localizar el paquete oficial de Oracle Spatial/Geocoder que
+   corresponda a la versión de la base de datos y al proveedor de datos.
+2. Ejecutar los scripts oficiales con el usuario, tablespaces, privilegios y
+   esquema indicados por Oracle. No modificar los nombres de objetos ni omitir
+   scripts de instalación, índices, tipos, sinónimos o paquetes auxiliares.
+3. Ejecutar los scripts oficiales de carga o configuración del país España.
+   Deben quedar creados y relacionados, como mínimo, el perfil de país
+   (`GC_COUNTRY_PROFILE`), las tablas geocoder `GC_*_ES` y los objetos de
+   perfiles del parser (`GC_PARSER_PROFILES` y `GC_PARSER_PROFILEAFS`) que
+   incluya la distribución instalada.
+4. Configurar el idioma español usando los valores y procedimientos del
+   paquete oficial. La configuración debe cubrir el código de idioma, el país
+   `ES`, las reglas de normalización de nombres y tipos de vía, los
+   separadores, abreviaturas y alias que utilice el parser. No asumir que
+   `SPA`, `ES` o un nombre de perfil son válidos sin comprobarlos en la
+   instalación.
+5. Activar o asociar el perfil español al perfil de país y al servicio de
+   geocodificación conforme a la documentación de la versión instalada.
+   Confirmar especialmente el perfil por defecto, el idioma de entrada y las
+   reglas de transliteración/acentos.
+6. Obtener el DDL y los metadatos resultantes para documentar la instalación:
+
+   ```sql
+   SELECT DBMS_METADATA.GET_DDL('TABLE', table_name, USER)
+   FROM user_tables
+   WHERE table_name IN (
+     'GC_COUNTRY_PROFILE', 'GC_AREA_ES', 'GC_POSTAL_CODE_ES',
+     'GC_ROAD_ES', 'GC_ROAD_SEGMENT_ES', 'GC_ADDRESS_POINT_ES',
+     'GC_POI_ES', 'GC_PARSER_PROFILES', 'GC_PARSER_PROFILEAFS'
+   );
+   ```
+
+   También deben revisarse `USER_TAB_COLUMNS`, `USER_CONSTRAINTS`,
+   `USER_INDEXES`, `USER_SDO_GEOM_METADATA` y los objetos `PACKAGE`,
+   `FUNCTION` y `PROCEDURE` instalados por Oracle.
+7. Ejecutar una prueba mínima de parseo y geocodificación en español con
+   direcciones que contengan tipos de vía, acentos, números y códigos postales.
+   Registrar el perfil utilizado y verificar que las tablas españolas y sus
+   índices espaciales participan en la consulta.
+8. Solo después de esa validación, adaptar
+   `sql/04_load_gc_es_adapter.sql` a las columnas reales y cargar los datos
+   desde `STG_GC_*_ES`.
+
+Los scripts oficiales incorporados por la instalación deben conservarse
+separados de los scripts de este repositorio, por ejemplo bajo
+`sql/oracle_official/`. No se deben versionar credenciales, contraseñas ni
+salidas que contengan información sensible de la base de datos.
+
 ## 4. Fase 3: crear un modelo staging
 
 No se recomienda cargar directamente desde Shapefile o GeoPackage a las

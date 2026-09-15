@@ -69,6 +69,30 @@ scripts y procedimientos oficiales de Oracle correspondientes a la versión
 instalada. El modelo preparado durante esta fase solo sirve para orientar la
 transformación y la carga posterior en el esquema oficial.
 
+### Creación de objetos Oracle y perfiles de lenguaje
+
+El procedimiento detallado está documentado en
+[`objetos_gc_oracle.md`](objetos_gc_oracle.md).
+
+Antes de ejecutar la carga final:
+
+1. Ejecutar los scripts oficiales de Oracle Geocoder para crear el perfil de
+   país, las tablas `GC_*_ES`, sus restricciones, tipos, metadatos e índices.
+2. Ejecutar la configuración oficial de los perfiles del parser y asociar el
+   idioma español al país `ES`. Deben verificarse las abreviaturas y tipos de
+   vía, normalización de acentos, alias y reglas de entrada.
+3. Validar que `GC_COUNTRY_PROFILE`, `GC_PARSER_PROFILES`,
+   `GC_PARSER_PROFILEAFS` y las tablas españolas existan y estén relacionadas
+   según la documentación de la versión instalada.
+4. Extraer el DDL real con `DBMS_METADATA.GET_DDL` y adaptar después
+   `sql/04_load_gc_es_adapter.sql` a ese esquema.
+5. Probar el parser y una geocodificación en español antes de cargar el ETL.
+
+Los nombres de perfiles, códigos de idioma y procedimientos no se fijan en
+este repositorio porque dependen de la versión de Oracle Geocoder y del
+proveedor de datos. Los scripts oficiales deben incorporarse, si procede, en
+`sql/oracle_official/`, sin credenciales ni datos sensibles.
+
 ## Siguiente paso técnico
 
 Para generar y validar un cargador exacto para `GC_*_ES` hay que:
