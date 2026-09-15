@@ -1,6 +1,7 @@
 
 --Usa el código con precaución.Nota: Este comando genera en segundo plano la estructura exacta para las siguientes tres entidades:
--- GC_COUNTRY_PROFILEGC_PARSER_PROFILESPosteriormente, la documentación indica que debes poblar las reglas gramaticales cargando el script oficial del servidor: 
+-- GC_COUNTRY_PROFILEGC_PARSER_PROFILES
+--	Posteriormente, la documentación indica que debes poblar las reglas gramaticales cargando el script oficial del servidor: 
 --		[1]$ORACLE_HOME/md/admin/sdogcprs.sql
 
 -- 4. GC_AREA_ES Table
