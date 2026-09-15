@@ -1,3 +1,6 @@
+
+Usa el código con precaución.Nota: Este comando genera en segundo plano la estructura exacta para las siguientes tres entidades:GC_COUNTRY_PROFILEGC_PARSER_PROFILESPosteriormente, la documentación indica que debes poblar las reglas gramaticales cargando el script oficial del servidor: [1] (/goto?url=CAESmgEB6zswFUFiBWWBTkHcMU-cTO_a4uV_BDK0LzLZ7EM34IuPmLVBTbeJYzQQPrKH_xuF45UdscdBm4Dn32jlQrOx98zsnF8SEIMBYfQzRw2UNo11AQVMZaBZZzIVPgDRTrunfdnsHv5kdjr_Z_29FVTS2Ro2ra4Pyql_6Jbubq5_wA1wag47HwQXZVuimx9F4aQgeVTsKnoBBSVV)sql@$ORACLE_HOME/md/admin/sdogcprs.sql
+
 sql-- 4. GC_AREA_ES Table
 CREATE TABLE GC_AREA_ES (
     AREA_ID               NUMBER PRIMARY KEY,
