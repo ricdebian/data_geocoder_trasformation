@@ -7,7 +7,7 @@ param(
     [ValidateSet('--force')]
     [string]$Force
 )
-
+$env:Path += ";C:\Program Files\QGIS 3.44.4\bin"
 $ErrorActionPreference = 'Stop'
 $raw = Join-Path $WorkDir 'raw'
 $output = Join-Path $WorkDir 'shapefile'

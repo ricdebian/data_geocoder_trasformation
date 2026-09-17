@@ -1,3 +1,4 @@
+#OciConnection {oci_user}/{oci_pass}@{oci_dsn}
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true, Position = 0)]
