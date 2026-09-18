@@ -36,6 +36,23 @@ objetos debe comprobarse en el dataset y en la documentación de la versión
 instalada. No se deben crear tablas vacías únicamente porque aparezcan en un
 modelo de referencia.
 
+La referencia oficial de Oracle 19c es el capítulo **Geocoding Address Data**
+de la *Oracle Spatial and Graph Developer's Guide*:
+
+<https://docs.oracle.com/en/database/oracle/oracle-database/19/spatl/>
+
+Oracle documenta `GC_ROAD_SEGMENT_<sufijo>.GEOMETRY` como la geometría espacial
+principal y su índice `MDSYS.SPATIAL_INDEX_V2`. Las tablas de áreas, códigos
+postales, POI, intersecciones y puntos de dirección usan principalmente
+identificadores y coordenadas numéricas en el modelo del proveedor; no se debe
+añadir una columna `SDO_GEOMETRY` a todas ellas por analogía con las tablas de
+staging.
+
+El script `complemento_objetos_gc_oracle_19c_drop_indices.sql` contiene un DDL
+candidato con `DROP`, metadatos e índice espacial para integración controlada.
+No sustituye al DDL del proveedor: antes de cargar datos hay que comparar sus
+columnas, restricciones, sufijo y SRID con `DBMS_METADATA.GET_DDL`.
+
 ## 1. Crear las tablas de perfiles
 
 Ejecutar con el usuario y los privilegios indicados por Oracle:
