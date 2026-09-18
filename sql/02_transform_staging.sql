@@ -5,6 +5,7 @@
 
 TRUNCATE TABLE STG_GC_ADDRESS_POINT_ES;
 TRUNCATE TABLE STG_GC_ROAD_ES;
+TRUNCATE TABLE STG_GC_ROAD_SEGMENT_ES;
 TRUNCATE TABLE STG_GC_AREA_ES;
 TRUNCATE TABLE STG_GC_POSTAL_CODE_ES;
 TRUNCATE TABLE STG_GC_POI_ES;
@@ -26,6 +27,20 @@ INSERT INTO STG_GC_ROAD_ES (
 SELECT osm_id, 'OSM', name, ref, oneway, fclass, geom
 FROM STG_OSM_ROAD
 WHERE osm_id IS NOT NULL AND geom IS NOT NULL;
+
+-- Fallback de segmento: cuando Redes de Transporte no se ha normalizado
+-- todavía, cada geometría lineal OSM se utiliza como segmento sin rangos.
+-- Si existe una transformación específica de STG_RT_*, debe sustituir este
+-- bloque para aportar los rangos izquierdo/derecho reales.
+INSERT INTO STG_GC_ROAD_SEGMENT_ES (
+  SOURCE_ID, SOURCE_NAME, ROAD_SOURCE_ID,
+  LEFT_FROM, LEFT_TO, RIGHT_FROM, RIGHT_TO, GEOM
+)
+SELECT SOURCE_ID, SOURCE_NAME, SOURCE_ID,
+       NULL, NULL, NULL, NULL, GEOM
+FROM STG_GC_ROAD_ES
+WHERE SOURCE_ID IS NOT NULL
+  AND GEOM IS NOT NULL;
 
 INSERT INTO STG_GC_POI_ES (SOURCE_ID, SOURCE_NAME, NAME, CLASS_NAME, GEOM)
 SELECT osm_id, 'OSM', name, fclass, geom
