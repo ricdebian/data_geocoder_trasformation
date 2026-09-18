@@ -122,11 +122,15 @@ The SQL scripts do the actual ETL logic:
 
 - Do not treat `GC_*_ES` as a schema that should be recreated manually. The repo explicitly warns against creating the official geocoder tables by hand; use the Oracle installation scripts and procedures for the actual target schema.
 - Prefer staging tables and keep the original source IDs (`SOURCE_ID`, `SOURCE_NAME`, `SOURCE_DATE`) throughout the transformation pipeline.
-- Maintain spatial metadata (`SDO_GEOMETRY`, SRID `4258`) and spatial indexes when creating Oracle spatial tables.
+- Maintain spatial metadata (`SDO_GEOMETRY`, SRID `4258`) and spatial indexes
+  for the canonical staging tables. In the official Geocoder model, the
+  essential spatial object is normally `GC_ROAD_SEGMENT_ES.GEOMETRY`; do not
+  propagate staging geometries for areas, postal codes, address points or POI
+  into official `GC_*_ES` tables without validating the installed provider DDL.
 - Use the project’s source hierarchy: raw downloads -> inventory -> shapefile conversion -> staging load -> canonical `STG_GC_*_ES` transform -> validation -> final geocoder mapping.
 - When editing transformations, keep the Oracle Geocoder model in mind, especially these high-value entities:
   - `GC_AREA_ES` (administrative areas)
-  - `GC_POSTAL_CODE_ES` (postal code geometry and relations)
+  - `GC_POSTAL_CODE_ES` (postal code relations and optional center coordinates)
   - `GC_ROAD_ES` (normalized roads)
   - `GC_ROAD_SEGMENT_ES` (road segments and address ranges)
   - `GC_ADDRESS_POINT_ES` (address points)

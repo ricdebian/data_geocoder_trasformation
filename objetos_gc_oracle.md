@@ -48,6 +48,34 @@ identificadores y coordenadas numéricas en el modelo del proveedor; no se debe
 añadir una columna `SDO_GEOMETRY` a todas ellas por analogía con las tablas de
 staging.
 
+### Qué geometría necesita realmente el Geocoder
+
+La geometría crítica para la resolución espacial de direcciones es la línea de
+`GC_ROAD_SEGMENT_ES.GEOMETRY`. El motor utiliza los segmentos para buscar el
+tramo vial, resolver rangos de numeración e interpolar la posición de una
+dirección. Por ello, esta columna debe conservarse como `MDSYS.SDO_GEOMETRY`,
+registrarse en `USER_SDO_GEOM_METADATA` y disponer del índice espacial que
+requiera la instalación, normalmente `MDSYS.SPATIAL_INDEX_V2`.
+
+Las demás tablas representan contexto de búsqueda, no capas GIS completas:
+
+| Tabla | Uso principal de la información espacial |
+|---|---|
+| `GC_ROAD_ES` | Identidad y atributos del vial; la geometría está en sus segmentos |
+| `GC_ADDRESS_POINT_ES` | Portal, lado, número y coordenadas del punto |
+| `GC_POI_ES` | Punto de interés y coordenadas |
+| `GC_INTERSECTION_ES` | Intersección y coordenadas |
+| `GC_AREA_ES` | Jerarquía administrativa, referencias y centroide |
+| `GC_POSTAL_CODE_ES` | Código postal, relaciones y centroide |
+
+Que las tablas de staging tengan `GEOM` no implica que esas columnas formen
+parte del DDL oficial de `GC_*_ES`. Las geometrías de
+`STG_GC_AREA_ES`, `STG_GC_POSTAL_CODE_ES`, `STG_GC_ADDRESS_POINT_ES` o
+`STG_GC_POI_ES` pueden utilizarse durante el ETL para validación, asociación
+espacial y cálculo de coordenadas. Si se requieren polígonos de áreas o
+códigos postales para análisis GIS, deben almacenarse en tablas auxiliares
+propias y no añadirse al modelo oficial sin validar el DDL del proveedor.
+
 El script `complemento_objetos_gc_oracle_19c_drop_indices.sql` contiene un DDL
 candidato con `DROP`, metadatos e índice espacial para integración controlada.
 No sustituye al DDL del proveedor: antes de cargar datos hay que comparar sus

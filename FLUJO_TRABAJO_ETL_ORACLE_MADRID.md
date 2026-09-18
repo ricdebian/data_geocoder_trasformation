@@ -253,7 +253,9 @@ oficial.
 
 Construir los códigos postales y sus relaciones con municipios y áreas.
 CartoCiudad aporta el código postal en `portalpk_publi`; será necesario agrupar
-los portales y generar la representación requerida por Oracle.
+los portales y generar la representación requerida por Oracle. La geometría de
+los polígonos postales, si se conserva, pertenece al staging o a una tabla GIS
+auxiliar; no debe asumirse como una columna `SDO_GEOMETRY` del objeto oficial.
 
 ### 6.3. `GC_ROAD_ES`
 
@@ -271,7 +273,9 @@ estables.
 Es la parte más compleja del proceso. Hay que:
 
 - Agrupar los tramos pertenecientes al mismo vial.
-- Mantener la geometría de cada segmento.
+- Mantener la geometría lineal de cada segmento en
+  `GC_ROAD_SEGMENT_ES.GEOMETRY`; es la geometría espacial principal que utiliza
+  el Geocoder.
 - Relacionar cada segmento con su vial.
 - Determinar rangos de numeración izquierda y derecha cuando estén disponibles.
 - Asociar portales a segmentos.
@@ -279,6 +283,13 @@ Es la parte más compleja del proceso. Hay que:
   requiera.
 
 No se debe generar esta tabla copiando únicamente las calles de OSM.
+
+En el modelo estándar, los segmentos son la única geometría espacial
+imprescindible para la resolución de direcciones. Las geometrías de portales,
+POI, áreas o códigos postales pueden conservarse en staging para controles,
+emparejamientos y cálculo de coordenadas, pero el destino oficial puede
+requerir referencias y coordenadas numéricas en lugar de columnas
+`SDO_GEOMETRY`. La decisión final debe basarse en el DDL instalado.
 
 ### 6.5. `GC_ADDRESS_POINT_ES`
 

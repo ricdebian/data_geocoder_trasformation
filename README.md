@@ -45,10 +45,10 @@ Oracle Spatial usa, entre otras, estas tablas:
 |---|---|---|
 | `GC_ADDRESS_POINT_ES` | Coordenadas de portales | CartoCiudad `portalpk_publi`; OSM `addr:*` como complemento |
 | `GC_ROAD_ES` | Viales normalizados | Geofabrik/OSM `highway` + Redes de Transporte |
-| `GC_ROAD_SEGMENT_ES` | Segmentos y rangos de numeración | Redes de Transporte y portales; OSM puede completar geometría |
+| `GC_ROAD_SEGMENT_ES` | Segmentos, rangos y geometría lineal principal | Redes de Transporte y portales; OSM puede completar geometría |
 | `GC_AREA_ES` | Comunidades, provincias, municipios y poblaciones | Tablas auxiliares CartoCiudad; límites OSM como apoyo |
-| `GC_POSTAL_CODE_ES` | Códigos postales y geometrías | Fuente oficial/CartoCiudad; OSM como contraste |
-| `GC_POI_ES` | Puntos de interés, si se desean | Geofabrik/OSM |
+| `GC_POSTAL_CODE_ES` | Códigos postales y relaciones, normalmente con coordenadas de centro | Fuente oficial/CartoCiudad; OSM como contraste |
+| `GC_POI_ES` | Puntos de interés y coordenadas | Geofabrik/OSM |
 
 Por tanto, el GeoPackage de CartoCiudad por provincia no permite construir
 correctamente todo el conjunto Oracle por sí solo. La capa `manzana` es útil como
@@ -68,6 +68,33 @@ Las tablas, tipos de datos, restricciones, índices espaciales, metadatos de
 scripts y procedimientos oficiales de Oracle correspondientes a la versión
 instalada. El modelo preparado durante esta fase solo sirve para orientar la
 transformación y la carga posterior en el esquema oficial.
+
+### Geometría principal del Geocoder
+
+En el modelo documentado del Oracle Geocoder, la geometría espacial esencial
+para resolver direcciones es:
+
+```text
+GC_ROAD_SEGMENT_ES.GEOMETRY
+```
+
+El segmento vial permite localizar el tramo más próximo, interpolar números de
+portal, calcular posiciones y devolver una coordenada para direcciones que no
+tienen un portal exacto. `GC_ROAD_ES` describe el vial lógico; sus segmentos
+contienen la geometría lineal.
+
+Las tablas `GC_AREA_ES`, `GC_POSTAL_CODE_ES`, `GC_ADDRESS_POINT_ES`,
+`GC_POI_ES` y `GC_INTERSECTION_ES` complementan la resolución mediante
+identificadores, jerarquías, referencias al segmento y coordenadas numéricas.
+No se debe asumir que necesitan una columna `SDO_GEOMETRY` ni un índice
+espacial propio en el esquema oficial.
+
+Las geometrías que sí existen en las tablas `STG_GC_*_ES` se mantienen para
+control de calidad, emparejamiento espacial, generación de coordenadas o
+transformación. Solo la geometría de los segmentos debe trasladarse
+automáticamente a `GC_ROAD_SEGMENT_ES`; las geometrías de áreas, códigos
+postales, portales y POI pueden conservarse en tablas GIS auxiliares si se
+necesitan análisis de contención o cartografía.
 
 ### Creación de objetos Oracle y perfiles de lenguaje
 
@@ -105,8 +132,11 @@ Para generar y validar un cargador exacto para `GC_*_ES` hay que:
 
 El Shapefile es un formato intermedio válido para `ogr2ogr`/carga espacial, pero
 no conserva algunas capacidades de Oracle (por ejemplo, restricciones,
-índices y tipos específicos). La carga final debe crear `SDO_GEOMETRY` e índices
-espaciales en Oracle.
+índices y tipos específicos). En el modelo estándar del Geocoder, la carga
+espacial principal debe crear `SDO_GEOMETRY`, sus metadatos y el índice espacial
+para `GC_ROAD_SEGMENT_ES.GEOMETRY`. Las demás entidades pueden requerir
+coordenadas numéricas y referencias al segmento; no se deben crear índices
+espaciales adicionales sin validar el DDL oficial.
 
 ## Licencia
 
