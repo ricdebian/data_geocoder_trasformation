@@ -1,5 +1,12 @@
 # Scripts ETL espacial hacia Oracle Geocoder
 
+Los dos flujos de carga se conservan en directorios separados:
+
+- `flujo-directo-gpkg/`: carga directamente desde GeoPackage.
+- `flujo-shapefile/`: convierte previamente a Shapefile y carga desde ese formato.
+
+Cada directorio contiene su propio `README.md` y los lanzadores del flujo.
+
 El flujo no crea manualmente las tablas oficiales `GC_*_ES`. Oracle debe crear
 esas tablas y sus índices mediante sus scripts y procedimientos propios. Estos
 scripts preparan los datos y dejan una zona staging estable para el adaptador de
