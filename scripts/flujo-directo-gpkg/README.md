@@ -8,5 +8,12 @@ GeoPackage mediante `ogr2ogr`, sin generar previamente Shapefiles.
 ./scripts/flujo-directo-gpkg/02_load_staging.sh ./work usuario/password@servicio GEOCODER
 ```
 
+En PowerShell:
+
+```powershell
+.\scripts\flujo-directo-gpkg\01_prepare_sources.ps1 .\work
+.\scripts\flujo-directo-gpkg\02_load_staging.ps1 .\work usuario/password@servicio GEOCODER
+```
+
 Las tablas canónicas se crean y transforman con los mismos scripts SQL del
 repositorio (`sql/01_create_staging.sql`, `sql/02_transform_staging.sql`, etc.).

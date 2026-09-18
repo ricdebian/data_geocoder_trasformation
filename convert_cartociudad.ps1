@@ -34,7 +34,7 @@ $layers = @(
         ForEach-Object { $_.Matches[0].Groups[1].Value }
 )
 if ($layers.Count -eq 0) {
-    throw "No se encontraron capas en $Input"
+    throw "No se encontraron capas en $InputPath"
 }
 
 foreach ($layer in $layers) {
