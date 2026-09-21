@@ -15,25 +15,27 @@ BEGIN
 END;
 /
 
-INSERT ALL
+INSERT 
   INTO user_sdo_geom_metadata VALUES
     ('STG_GC_ADDRESS_POINT_ES', 'GEOM',
      MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', -180, 180, 0.000001),
-                         MDSYS.SDO_DIM_ELEMENT('Y', -90, 90, 0.000001)), 4258)
+                         MDSYS.SDO_DIM_ELEMENT('Y', -90, 90, 0.000001)), 4258);
+insert                         
   INTO user_sdo_geom_metadata VALUES
     ('STG_GC_ROAD_ES', 'GEOM',
      MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', -180, 180, 0.000001),
-                         MDSYS.SDO_DIM_ELEMENT('Y', -90, 90, 0.000001)), 4258)
+                         MDSYS.SDO_DIM_ELEMENT('Y', -90, 90, 0.000001)), 4258);
+insert                         
   INTO user_sdo_geom_metadata VALUES
     ('STG_GC_ROAD_SEGMENT_ES', 'GEOM',
      MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', -180, 180, 0.000001),
-                         MDSYS.SDO_DIM_ELEMENT('Y', -90, 90, 0.000001)), 4258)
-  INTO user_sdo_geom_metadata VALUES
+                         MDSYS.SDO_DIM_ELEMENT('Y', -90, 90, 0.000001)), 4258);
+insert INTO user_sdo_geom_metadata VALUES
     ('STG_GC_AREA_ES', 'GEOM',
      MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', -180, 180, 0.000001),
-                         MDSYS.SDO_DIM_ELEMENT('Y', -90, 90, 0.000001)), 4258)
-  INTO user_sdo_geom_metadata VALUES
+                         MDSYS.SDO_DIM_ELEMENT('Y', -90, 90, 0.000001)), 4258);
+ insert INTO user_sdo_geom_metadata VALUES
     ('STG_GC_POI_ES', 'GEOM',
      MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X', -180, 180, 0.000001),
-                         MDSYS.SDO_DIM_ELEMENT('Y', -90, 90, 0.000001)), 4258)
-SELECT 1 FROM dual;
+                         MDSYS.SDO_DIM_ELEMENT('Y', -90, 90, 0.000001)), 4258);
+--SELECT 1 FROM dual;
