@@ -6,6 +6,9 @@
 
 -- 4. GC_AREA_ES Table
 
+
+drop table GC_AREA_ES cascade constraint
+/
 CREATE TABLE GC_AREA_ES (
     AREA_ID               NUMBER PRIMARY KEY,
     PARENT_AREA_ID        NUMBER,
@@ -16,6 +19,8 @@ CREATE TABLE GC_AREA_ES (
 CREATE INDEX IDX_GC_AREA_NAME_ES ON GC_AREA_ES(AREA_NAME);
 
 -- 5. GC_POSTAL_CODE_ES Table
+drop table GC_POSTAL_CODE_ES cascade constraint
+/
 CREATE TABLE GC_POSTAL_CODE_ES (
     POSTAL_CODE_ID        NUMBER PRIMARY KEY,
     POSTAL_CODE           VARCHAR2(16), -- Código postal (ej: '28046')
@@ -25,6 +30,8 @@ CREATE TABLE GC_POSTAL_CODE_ES (
 CREATE INDEX IDX_GC_PCODE_VAL_ES ON GC_POSTAL_CODE_ES(POSTAL_CODE);
 
 -- 6. GC_ROAD_ES Table
+drop table GC_ROAD_ES cascade constraint
+/
 CREATE TABLE GC_ROAD_ES (
     ROAD_ID               NUMBER PRIMARY KEY,
     ROAD_NAME             VARCHAR2(128), -- Nombre de la vía (ej: 'CASTELLANA')
@@ -32,9 +39,13 @@ CREATE TABLE GC_ROAD_ES (
     ROAD_SUFFIX           VARCHAR2(32),
     ROAD_TYPE             VARCHAR2(32)
 );
+drop index IDX_GC_ROAD_NAME_ES
+/
 CREATE INDEX IDX_GC_ROAD_NAME_ES ON GC_ROAD_ES(ROAD_NAME);
 
 -- 7. GC_ROAD_SEGMENT_ES Table
+drop table GC_ROAD_SEGMENT_ES cascade constraint
+/
 CREATE TABLE GC_ROAD_SEGMENT_ES (
     ROAD_SEGMENT_ID       NUMBER PRIMARY KEY, -- Id de tramo coincidente con motores de ruteo
     ROAD_ID               NUMBER NOT NULL,
@@ -50,6 +61,8 @@ CREATE TABLE GC_ROAD_SEGMENT_ES (
 );
 
 -- 8. GC_ADDRESS_POINT_ES Table and Index
+drop table GC_ADDRESS_POINT_ES cascade constraint
+/
 CREATE TABLE GC_ADDRESS_POINT_ES (
     ADDRESS_POINT_ID      NUMBER PRIMARY KEY,
     ROAD_SEGMENT_ID       NUMBER NOT NULL,
@@ -61,6 +74,8 @@ CREATE TABLE GC_ADDRESS_POINT_ES (
 );
 
 -- 9. GC_INTERSECTION_ES Table
+drop table GC_INTERSECTION_ES cascade constraint
+/
 CREATE TABLE GC_INTERSECTION_ES (
     INTERSECTION_ID       NUMBER PRIMARY KEY,
     ROAD_SEGMENT_ID_1     NUMBER NOT NULL,
@@ -69,6 +84,8 @@ CREATE TABLE GC_INTERSECTION_ES (
 );
 
 -- 10. GC_POI_ES Table
+drop table GC_POI_ES cascade constraint
+/
 CREATE TABLE GC_POI_ES (
     POI_ID                NUMBER PRIMARY KEY,
     POI_NAME              VARCHAR2(256), -- Puntos de Interés (ej: 'Hospital La Paz')
@@ -92,5 +109,9 @@ INSERT INTO user_sdo_geom_metadata (table_name, column_name, diminfo, srid) VALU
 );
 
 -- Crear los índices espaciales obligatorios
+drop index SX_GC_ROAD_SEG_ES
+/
 CREATE INDEX SX_GC_ROAD_SEG_ES ON GC_ROAD_SEGMENT_ES(GEOMETRY) INDEXTYPE IS MDSYS.SPATIAL_INDEX_V2;
+drop index SX_GC_ADDR_PT_ES
+/
 CREATE INDEX SX_GC_ADDR_PT_ES ON GC_ADDRESS_POINT_ES(GEOMETRY) INDEXTYPE IS MDSYS.SPATIAL_INDEX_V2;
