@@ -80,9 +80,10 @@ Get-ChildItem -Path $raw -Recurse -File -Filter '*.gpkg' |
             $safeLayer = Get-SafeName $layer
             $target = Join-Path $targetDir "$safeLayer.shp"
             Write-Output "Convirtiendo $($_.FullName):$layer -> $target"
+
             & ogr2ogr -f 'ESRI Shapefile' $target $_.FullName $layer `
                 -t_srs EPSG:4326 -nlt PROMOTE_TO_MULTI `
-                -lco ENCODING=UTF-8 -overwrite
+                -lco ENCODING=UTF-8 -overwrite  
             if ($LASTEXITCODE -ne 0) {
                 throw "ogr2ogr falló para $($_.FullName):$layer"
             }

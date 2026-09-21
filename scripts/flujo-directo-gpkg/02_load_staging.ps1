@@ -9,6 +9,26 @@ param(
     [Parameter(Position = 2)]
     [string]$Schema
 )
+echo $OciConnection
+echo "***********"
+$env:Path += ";C:\Program Files\QGIS 3.44.4\bin"
+$env:Path += ";C:\Users\mamaberi\instantclient_23_26"
+$env:OGR_FORCE_LOCAL_TIME_ZONE = ""
+$env:ORA_SDTZ = "Europe/Madrid"
+$env:NLS_LANG="SPANISH_SPAIN.UTF8"
+#$env:TNS_ADMIN = "C:\Users\mamaberi\network\admin"
+# Asegura que las variables de GDAL sigan activas
+#$env:GDAL_DATA = "C:\OSGeo4W\share\gdal"
+#$env:PROJ_LIB = "C:\OSGeo4W\share\proj"
+
+# Fuerza a GDAL a buscar plugins en la carpeta correcta de OSGeo4W
+$env:GDAL_DRIVER_PATH = "C:\Program Files\QGIS 3.44.4\apps\gdal\lib\gdalplugins"
+
+
+#& "C:\Program Files\QGIS 3.44.4\bin\o4w_env.bat"
+$env:GDAL_DATA = "C:\Program Files\QGIS 3.44.4\apps\gdal\share\gdal"
+$env:PROJ_DATA = "C:\Program Files\QGIS 3.44.4\share\proj"
+
 
 $ErrorActionPreference = 'Stop'
 $raw = Join-Path $WorkDir 'raw'
@@ -42,14 +62,15 @@ function Load-Layer {
         [string]$Layer,
         [string]$Target
     )
-
+    echo "Abriendo conexiÛn: $OciConnection"
     if (-not (Test-Path $Source -PathType Leaf)) {
         throw "No existe la fuente: $Source"
     }
     Write-Output "Cargando $Layer -> $Target"
     & ogr2ogr -f OCI "OCI:$OciConnection" $Source $Layer `
-        -nln $Target -lco GEOMETRY_NAME=GEOM `
-        -lco DIM=2 -lco SRID=4258 -overwrite
+        -nln $Target -lco GEOMETRY_NAME=GEOMETRY `
+        -lco DIM=2 -lco SRID=4258 -overwrite `
+        -mapFieldType DateTime=String
     if ($LASTEXITCODE -ne 0) {
         throw "ogr2ogr fall√≥ al cargar $Layer"
     }
@@ -71,4 +92,4 @@ Load-Layer (Join-Path $rtDir 'rt_portalpk_p.shp') 'rt_portalpk_p' (Get-TargetTab
 Load-Layer (Join-Path $rtDir 'rt_puntoctra_p.shp') 'rt_puntoctra_p' (Get-TargetTable 'STG_RT_PUNTOCTRA')
 Load-Layer (Join-Path $rtDir 'rt_nodoctra_p.shp') 'rt_nodoctra_p' (Get-TargetTable 'STG_RT_NODOCTRA')
 Load-Layer (Join-Path $rtDir 'rt_areactra_s.shp') 'rt_areactra_s' (Get-TargetTable 'STG_RT_AREACTRA')
-}
+

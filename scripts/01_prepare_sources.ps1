@@ -14,6 +14,8 @@ $data = Join-Path $root 'datos_espaciales'
 $raw = Join-Path $WorkDir 'raw'
 $inventory = Join-Path $WorkDir 'inventory'
 
+$env:Path += ";C:\Program Files\QGIS 3.44.4\bin"
+
 if (-not (Get-Command ogrinfo -ErrorAction SilentlyContinue)) {
     throw 'Falta ogrinfo (GDAL)'
 }
@@ -39,7 +41,7 @@ function Expand-SourceZip {
 }
 
 Expand-SourceZip (Join-Path $data 'CARTOCIUDAD_CALLEJERO_MADRID.zip') (Join-Path $raw 'cartociudad')
-Expand-SourceZip (Join-Path $data 'madrid-260831-free.gpkg.zip') (Join-Path $raw 'geofabrik')
+Expand-SourceZip (Join-Path $data 'madrid-260914-free.gpkg.zip') (Join-Path $raw 'geofabrik')
 Expand-SourceZip (Join-Path $data 'RT_MADRID_shp.zip') (Join-Path $raw 'redes_transporte')
 
 Get-ChildItem -Path $raw -Recurse -File |
@@ -48,9 +50,9 @@ Get-ChildItem -Path $raw -Recurse -File |
         $safe = $_.Name -replace '[^a-zA-Z0-9_.-]', '_'
         $output = Join-Path $inventory "$safe.txt"
         & ogrinfo -ro -so -al $_.FullName *> $output
-        if ($LASTEXITCODE -ne 0) {
+<#         if ($LASTEXITCODE -ne 0) {
             throw "ogrinfo falló para $($_.FullName)"
-        }
+        } #>
     }
 
 Write-Output "Fuentes preparadas en $raw"

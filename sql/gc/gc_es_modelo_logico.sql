@@ -1,4 +1,4 @@
--- Modelo l√≥gico de referencia GC_*_ES
+-- Modelo lÛgico de referencia GC_*_ES
 
 CREATE TABLE GC_AREA_ES (
     AREA_ID             NUMBER         NOT NULL,
@@ -11,14 +11,14 @@ CREATE TABLE GC_AREA_ES (
     CONSTRAINT PK_GC_AREA_ES PRIMARY KEY (AREA_ID)
 );
 
-COMMENT ON TABLE GC_AREA_ES IS '√Åreas administrativas utilizadas por el geocoder de Espa√±a.';
-COMMENT ON COLUMN GC_AREA_ES.AREA_ID IS 'Identificador √∫nico del √°rea administrativa.';
-COMMENT ON COLUMN GC_AREA_ES.PARENT_AREA_ID IS 'Identificador del √°rea administrativa superior.';
-COMMENT ON COLUMN GC_AREA_ES.AREA_TYPE IS 'Tipo de √°rea: comunidad aut√≥noma, provincia, municipio o poblaci√≥n.';
-COMMENT ON COLUMN GC_AREA_ES.AREA_CODE IS 'C√≥digo oficial de la divisi√≥n administrativa.';
-COMMENT ON COLUMN GC_AREA_ES.AREA_NAME IS 'Nombre normalizado del √°rea administrativa.';
-COMMENT ON COLUMN GC_AREA_ES.COUNTRY_CODE IS 'C√≥digo ISO del pa√≠s (ES).';
-COMMENT ON COLUMN GC_AREA_ES.GEOM IS 'Geometr√≠a del √°rea administrativa.';
+COMMENT ON TABLE GC_AREA_ES IS '¡reas administrativas utilizadas por el geocoder de EspaÒa.';
+COMMENT ON COLUMN GC_AREA_ES.AREA_ID IS 'Identificador ˙nico del ·rea administrativa.';
+COMMENT ON COLUMN GC_AREA_ES.PARENT_AREA_ID IS 'Identificador del ·rea administrativa superior.';
+COMMENT ON COLUMN GC_AREA_ES.AREA_TYPE IS 'Tipo de ·rea: comunidad autÛnoma, provincia, municipio o poblaciÛn.';
+COMMENT ON COLUMN GC_AREA_ES.AREA_CODE IS 'CÛdigo oficial de la divisiÛn administrativa.';
+COMMENT ON COLUMN GC_AREA_ES.AREA_NAME IS 'Nombre normalizado del ·rea administrativa.';
+COMMENT ON COLUMN GC_AREA_ES.COUNTRY_CODE IS 'CÛdigo ISO del paÌs (ES).';
+COMMENT ON COLUMN GC_AREA_ES.GEOM IS 'GeometrÌa del ·rea administrativa.';
 
 CREATE TABLE GC_POSTAL_CODE_ES (
     POSTAL_CODE_ID      NUMBER         NOT NULL,
@@ -29,11 +29,11 @@ CREATE TABLE GC_POSTAL_CODE_ES (
     CONSTRAINT FK_GC_POSTAL_AREA FOREIGN KEY (AREA_ID) REFERENCES GC_AREA_ES (AREA_ID)
 );
 
-COMMENT ON TABLE GC_POSTAL_CODE_ES IS 'C√≥digos postales utilizados por el geocoder de Espa√±a.';
-COMMENT ON COLUMN GC_POSTAL_CODE_ES.POSTAL_CODE_ID IS 'Identificador √∫nico del c√≥digo postal.';
-COMMENT ON COLUMN GC_POSTAL_CODE_ES.POSTAL_CODE IS 'C√≥digo postal de cinco d√≠gitos.';
-COMMENT ON COLUMN GC_POSTAL_CODE_ES.AREA_ID IS '√Årea administrativa a la que pertenece el c√≥digo postal.';
-COMMENT ON COLUMN GC_POSTAL_CODE_ES.GEOM IS 'Representaci√≥n espacial del √°rea postal.';
+COMMENT ON TABLE GC_POSTAL_CODE_ES IS 'CÛdigos postales utilizados por el geocoder de EspaÒa.';
+COMMENT ON COLUMN GC_POSTAL_CODE_ES.POSTAL_CODE_ID IS 'Identificador ˙nico del cÛdigo postal.';
+COMMENT ON COLUMN GC_POSTAL_CODE_ES.POSTAL_CODE IS 'CÛdigo postal de cinco dÌgitos.';
+COMMENT ON COLUMN GC_POSTAL_CODE_ES.AREA_ID IS '¡rea administrativa a la que pertenece el cÛdigo postal.';
+COMMENT ON COLUMN GC_POSTAL_CODE_ES.GEOM IS 'RepresentaciÛn espacial del ·rea postal.';
 
 CREATE TABLE GC_ROAD_ES (
     ROAD_ID             NUMBER         NOT NULL,
@@ -45,11 +45,11 @@ CREATE TABLE GC_ROAD_ES (
     CONSTRAINT FK_GC_ROAD_AREA FOREIGN KEY (AREA_ID) REFERENCES GC_AREA_ES (AREA_ID)
 );
 
-COMMENT ON TABLE GC_ROAD_ES IS 'Cat√°logo de viales utilizados por el geocoder.';
-COMMENT ON COLUMN GC_ROAD_ES.ROAD_ID IS 'Identificador √∫nico del vial.';
-COMMENT ON COLUMN GC_ROAD_ES.AREA_ID IS '√Årea administrativa donde se encuentra el vial.';
-COMMENT ON COLUMN GC_ROAD_ES.ROAD_TYPE IS 'Tipo de v√≠a normalizado: CALLE, AVENIDA, PLAZA, etc.';
-COMMENT ON COLUMN GC_ROAD_ES.ROAD_NAME IS 'Nombre principal del vial sin el tipo de v√≠a.';
+COMMENT ON TABLE GC_ROAD_ES IS 'Cat·logo de viales utilizados por el geocoder.';
+COMMENT ON COLUMN GC_ROAD_ES.ROAD_ID IS 'Identificador ˙nico del vial.';
+COMMENT ON COLUMN GC_ROAD_ES.AREA_ID IS '¡rea administrativa donde se encuentra el vial.';
+COMMENT ON COLUMN GC_ROAD_ES.ROAD_TYPE IS 'Tipo de vÌa normalizado: CALLE, AVENIDA, PLAZA, etc.';
+COMMENT ON COLUMN GC_ROAD_ES.ROAD_NAME IS 'Nombre principal del vial sin el tipo de vÌa.';
 COMMENT ON COLUMN GC_ROAD_ES.ROAD_FULL_NAME IS 'Nombre completo normalizado del vial.';
 
 CREATE TABLE GC_ROAD_SEGMENT_ES (
@@ -65,15 +65,15 @@ CREATE TABLE GC_ROAD_SEGMENT_ES (
     CONSTRAINT FK_GC_SEGMENT_ROAD FOREIGN KEY (ROAD_ID) REFERENCES GC_ROAD_ES (ROAD_ID)
 );
 
-COMMENT ON TABLE GC_ROAD_SEGMENT_ES IS 'Segmentos de vial utilizados en los procesos de geocodificaci√≥n.';
-COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.ROAD_SEGMENT_ID IS 'Identificador √∫nico del segmento.';
+COMMENT ON TABLE GC_ROAD_SEGMENT_ES IS 'Segmentos de vial utilizados en los procesos de geocodificaciÛn.';
+COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.ROAD_SEGMENT_ID IS 'Identificador ˙nico del segmento.';
 COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.ROAD_ID IS 'Identificador del vial al que pertenece el segmento.';
-COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.LEFT_FROM_NUMBER IS 'N√∫mero inicial de portal en el lado izquierdo del segmento.';
-COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.LEFT_TO_NUMBER IS 'N√∫mero final de portal en el lado izquierdo del segmento.';
-COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.RIGHT_FROM_NUMBER IS 'N√∫mero inicial de portal en el lado derecho del segmento.';
-COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.RIGHT_TO_NUMBER IS 'N√∫mero final de portal en el lado derecho del segmento.';
-COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.DIRECTION_CODE IS 'C√≥digo de direcci√≥n o sentido de circulaci√≥n asociado al segmento.';
-COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.GEOM IS 'Geometr√≠a lineal del segmento de vial.';
+COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.LEFT_FROM_NUMBER IS 'N˙mero inicial de portal en el lado izquierdo del segmento.';
+COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.LEFT_TO_NUMBER IS 'N˙mero final de portal en el lado izquierdo del segmento.';
+COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.RIGHT_FROM_NUMBER IS 'N˙mero inicial de portal en el lado derecho del segmento.';
+COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.RIGHT_TO_NUMBER IS 'N˙mero final de portal en el lado derecho del segmento.';
+COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.DIRECTION_CODE IS 'CÛdigo de direcciÛn o sentido de circulaciÛn asociado al segmento.';
+COMMENT ON COLUMN GC_ROAD_SEGMENT_ES.GEOM IS 'GeometrÌa lineal del segmento de vial.';
 
 CREATE TABLE GC_ADDRESS_POINT_ES (
     ADDRESS_POINT_ID    NUMBER         NOT NULL,
@@ -92,16 +92,16 @@ CREATE TABLE GC_ADDRESS_POINT_ES (
     CONSTRAINT FK_GC_ADDR_POSTAL FOREIGN KEY (POSTAL_CODE_ID) REFERENCES GC_POSTAL_CODE_ES (POSTAL_CODE_ID)
 );
 
-COMMENT ON TABLE GC_ADDRESS_POINT_ES IS 'Portales o puntos de direcci√≥n del geocoder de Espa√±a.';
-COMMENT ON COLUMN GC_ADDRESS_POINT_ES.ADDRESS_POINT_ID IS 'Identificador √∫nico del portal.';
+COMMENT ON TABLE GC_ADDRESS_POINT_ES IS 'Portales o puntos de direcciÛn del geocoder de EspaÒa.';
+COMMENT ON COLUMN GC_ADDRESS_POINT_ES.ADDRESS_POINT_ID IS 'Identificador ˙nico del portal.';
 COMMENT ON COLUMN GC_ADDRESS_POINT_ES.ROAD_ID IS 'Vial asociado al portal.';
 COMMENT ON COLUMN GC_ADDRESS_POINT_ES.ROAD_SEGMENT_ID IS 'Segmento de vial asociado al portal.';
-COMMENT ON COLUMN GC_ADDRESS_POINT_ES.AREA_ID IS '√Årea administrativa asociada al portal.';
-COMMENT ON COLUMN GC_ADDRESS_POINT_ES.POSTAL_CODE_ID IS 'C√≥digo postal asociado al portal.';
-COMMENT ON COLUMN GC_ADDRESS_POINT_ES.HOUSE_NUMBER IS 'N√∫mero principal del portal.';
-COMMENT ON COLUMN GC_ADDRESS_POINT_ES.HOUSE_EXTENSION IS 'Complemento, letra o extensi√≥n del n√∫mero de portal.';
-COMMENT ON COLUMN GC_ADDRESS_POINT_ES.SIDE_CODE IS 'Indicador del lado de la v√≠a en el que se encuentra el portal.';
-COMMENT ON COLUMN GC_ADDRESS_POINT_ES.GEOM IS 'Geometr√≠a puntual del portal.';
+COMMENT ON COLUMN GC_ADDRESS_POINT_ES.AREA_ID IS '¡rea administrativa asociada al portal.';
+COMMENT ON COLUMN GC_ADDRESS_POINT_ES.POSTAL_CODE_ID IS 'CÛdigo postal asociado al portal.';
+COMMENT ON COLUMN GC_ADDRESS_POINT_ES.HOUSE_NUMBER IS 'N˙mero principal del portal.';
+COMMENT ON COLUMN GC_ADDRESS_POINT_ES.HOUSE_EXTENSION IS 'Complemento, letra o extensiÛn del n˙mero de portal.';
+COMMENT ON COLUMN GC_ADDRESS_POINT_ES.SIDE_CODE IS 'Indicador del lado de la vÌa en el que se encuentra el portal.';
+COMMENT ON COLUMN GC_ADDRESS_POINT_ES.GEOM IS 'GeometrÌa puntual del portal.';
 
 CREATE TABLE GC_POI_ES (
     POI_ID              NUMBER         NOT NULL,
@@ -115,13 +115,13 @@ CREATE TABLE GC_POI_ES (
     CONSTRAINT FK_GC_POI_ADDRESS FOREIGN KEY (ADDRESS_POINT_ID) REFERENCES GC_ADDRESS_POINT_ES (ADDRESS_POINT_ID)
 );
 
-COMMENT ON TABLE GC_POI_ES IS 'Puntos de inter√©s utilizados por el geocoder.';
-COMMENT ON COLUMN GC_POI_ES.POI_ID IS 'Identificador √∫nico del punto de inter√©s.';
-COMMENT ON COLUMN GC_POI_ES.POI_NAME IS 'Nombre normalizado del punto de inter√©s.';
-COMMENT ON COLUMN GC_POI_ES.CATEGORY IS 'Categor√≠a funcional del punto de inter√©s.';
-COMMENT ON COLUMN GC_POI_ES.ROAD_ID IS 'Vial asociado al punto de inter√©s.';
-COMMENT ON COLUMN GC_POI_ES.ADDRESS_POINT_ID IS 'Portal asociado al punto de inter√©s cuando exista.';
-COMMENT ON COLUMN GC_POI_ES.GEOM IS 'Geometr√≠a puntual del punto de inter√©s.';
+COMMENT ON TABLE GC_POI_ES IS 'Puntos de interÈs utilizados por el geocoder.';
+COMMENT ON COLUMN GC_POI_ES.POI_ID IS 'Identificador ˙nico del punto de interÈs.';
+COMMENT ON COLUMN GC_POI_ES.POI_NAME IS 'Nombre normalizado del punto de interÈs.';
+COMMENT ON COLUMN GC_POI_ES.CATEGORY IS 'CategorÌa funcional del punto de interÈs.';
+COMMENT ON COLUMN GC_POI_ES.ROAD_ID IS 'Vial asociado al punto de interÈs.';
+COMMENT ON COLUMN GC_POI_ES.ADDRESS_POINT_ID IS 'Portal asociado al punto de interÈs cuando exista.';
+COMMENT ON COLUMN GC_POI_ES.GEOM IS 'GeometrÌa puntual del punto de interÈs.';
 
 CREATE INDEX IX_GC_AREA_ES_GEOM ON GC_AREA_ES (GEOM) INDEXTYPE IS MDSYS.SPATIAL_INDEX_V2;
 CREATE INDEX IX_GC_POSTAL_CODE_ES_GEOM ON GC_POSTAL_CODE_ES (GEOM) INDEXTYPE IS MDSYS.SPATIAL_INDEX_V2;
