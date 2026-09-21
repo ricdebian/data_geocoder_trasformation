@@ -12,9 +12,15 @@ $env:GDAL_DRIVER_PATH = "C:\Program Files\QGIS 3.44.4\apps\gdal\lib\gdalplugins"
 -mapFieldType DateTime=String
 #para que las fechas las pase a texto porque al cargar en base de datos da error la zona horaria del timestamp.
 
-<!-- la base de datos está en WE8ISO8859P1 y los fichero espaciales en UTF-8
+la base de datos está en WE8ISO8859P1 y los fichero espaciales en UTF-8
 Hay que añadir en la ejecución $env:NLS_LANG="SPANISH_SPAIN.UTF8" antes de la carga con ogr2ogr, 
-para que caracteres fuera de rango como acentos áéíóú y Ñ se se carguen bien. -->
+para que caracteres fuera de rango como acentos áéíóú y Ñ se se carguen bien. 
+
+Es importante que las variables siguientes estén creadas:
+$env:GDAL_DATA = "C:\Program Files\QGIS 3.44.4\apps\gdal\share\gdal"
+$env:PROJ_DATA = "C:\Program Files\QGIS 3.44.4\share\proj"
+
+
 
 Este directorio conserva el flujo que carga las capas directamente desde
 GeoPackage mediante `ogr2ogr`, sin generar previamente Shapefiles.

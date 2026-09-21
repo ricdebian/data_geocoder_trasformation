@@ -10,23 +10,24 @@ TRUNCATE TABLE STG_GC_AREA_ES;
 TRUNCATE TABLE STG_GC_POSTAL_CODE_ES;
 TRUNCATE TABLE STG_GC_POI_ES;
 
+
 INSERT INTO STG_GC_ADDRESS_POINT_ES (
   SOURCE_ID, SOURCE_NAME, STREET_TYPE, STREET_NAME, HOUSE_NUMBER, UNIT,
   PLACE_ID, PLACE_NAME, POSTAL_CODE, MUNICIPALITY_CODE, MUNICIPALITY_NAME,
   PROVINCE_NAME, REGION_NAME, SOURCE_DATE, GEOM
 )
-SELECT id_porpk, 'CARTOCIUDAD', tipo_vial, nombre_via, numero, extension,
-       id_pob, poblacion, LPAD(cod_postal, 5, '0'), ine_mun, municipio,
-       provincia, comunidad_autonoma, fecha_modificacion, geom
+SELECT "id_porpk", 'CARTOCIUDAD', "tipo_vial", "nombre_via", "numero", "extension",
+       "id_pob", "poblacion", LPAD("cod_postal", 5, '0'), "ine_mun", "municipio",
+       "provincia", "comunidad_autonoma", cast(to_timestamp("fecha_modificacion",'YYYY-MM-DD"T"HH24:MI:SS.FF') as timestamp(6)),geom
 FROM STG_CARTO_PORTAL
-WHERE id_porpk IS NOT NULL AND geom IS NOT NULL;
+WHERE "id_porpk" IS NOT NULL AND geom IS NOT NULL;
 
 INSERT INTO STG_GC_ROAD_ES (
   SOURCE_ID, SOURCE_NAME, NAME, REF, ONE_WAY, CLASS_NAME, GEOM
 )
-SELECT osm_id, 'OSM', name, ref, oneway, fclass, geom
+SELECT "osm_id", 'OSM', "name", "ref", "oneway", "fclass", geom
 FROM STG_OSM_ROAD
-WHERE osm_id IS NOT NULL AND geom IS NOT NULL;
+WHERE "osm_id" IS NOT NULL AND geom IS NOT NULL;
 
 -- Fallback de segmento: cuando Redes de Transporte no se ha normalizado
 -- todavía, cada geometría lineal OSM se utiliza como segmento sin rangos.
@@ -43,14 +44,14 @@ WHERE SOURCE_ID IS NOT NULL
   AND GEOM IS NOT NULL;
 
 INSERT INTO STG_GC_POI_ES (SOURCE_ID, SOURCE_NAME, NAME, CLASS_NAME, GEOM)
-SELECT osm_id, 'OSM', name, fclass, geom
-FROM STG_OSM_POI
-WHERE osm_id IS NOT NULL AND geom IS NOT NULL;
+SELECT "osm_id" "osm_id", 'OSM', p."name", p."fclass",p.geom
+FROM STG_OSM_POI p
+WHERE p."osm_id" IS NOT NULL AND p.geom IS NOT NULL;
 
 INSERT INTO STG_GC_AREA_ES (SOURCE_ID, SOURCE_NAME, AREA_TYPE, NAME, GEOM)
-SELECT osm_id, 'OSM', fclass, name, geom
+SELECT "osm_id", 'OSM', "fclass", "name", geom
 FROM STG_OSM_AREA
-WHERE osm_id IS NOT NULL AND geom IS NOT NULL;
+WHERE "osm_id" IS NOT NULL AND geom IS NOT NULL;
 
 INSERT INTO STG_GC_POSTAL_CODE_ES (
   POSTAL_CODE, MUNICIPALITY_CODE, MUNICIPALITY_NAME, SOURCE_NAME

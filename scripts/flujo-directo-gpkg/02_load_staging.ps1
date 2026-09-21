@@ -68,7 +68,7 @@ function Load-Layer {
     }
     Write-Output "Cargando $Layer -> $Target"
     & ogr2ogr -f OCI "OCI:$OciConnection" $Source $Layer `
-        -nln $Target -lco GEOMETRY_NAME=GEOMETRY `
+        -nln $Target -lco GEOMETRY_NAME=GEOM `
         -lco DIM=2 -lco SRID=4258 -overwrite `
         -mapFieldType DateTime=String
     if ($LASTEXITCODE -ne 0) {
