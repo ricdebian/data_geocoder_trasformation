@@ -269,6 +269,24 @@ INSERT INTO GC_ROAD_SEGMENT_ES (
   ROAD_SEGMENT_ID, ROAD_ID, POSTAL_CODE_ID, AREA_ID,
   LEFT_FROM_NUMBER, LEFT_TO_NUMBER, RIGHT_FROM_NUMBER, RIGHT_TO_NUMBER, GEOMETRY
 )
+WITH ranked_source_segments AS (
+  SELECT source_id, road_source_id, left_from, left_to, right_from, right_to,
+         geom,
+         ROW_NUMBER() OVER (
+           PARTITION BY source_id
+           ORDER BY road_source_id, left_from, left_to,
+                    right_from, right_to
+         ) AS duplicate_rn
+  FROM STG_GC_ROAD_SEGMENT_ES
+  WHERE source_id IS NOT NULL
+    AND geom IS NOT NULL
+),
+source_segments AS (
+  SELECT source_id, road_source_id, left_from, left_to, right_from, right_to,
+         geom
+  FROM ranked_source_segments
+  WHERE duplicate_rn = 1
+)
 SELECT m.road_segment_id,
        road_map.road_id,
        NULL,
@@ -278,15 +296,14 @@ SELECT m.road_segment_id,
        SUBSTR(s.right_from, 1, 16),
        SUBSTR(s.right_to, 1, 16),
        s.geom
-FROM STG_GC_ROAD_SEGMENT_ES s
+FROM source_segments s
 JOIN STG_GC_LOAD_SEGMENT_MAP m ON m.source_id = s.source_id
 JOIN STG_GC_LOAD_ROAD_MAP road_map ON road_map.source_id = s.road_source_id
-WHERE s.geom IS NOT NULL
-  AND NOT EXISTS (
-    SELECT 1
-    FROM GC_ROAD_SEGMENT_ES existing
-    WHERE existing.road_segment_id = m.road_segment_id
-  );
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM GC_ROAD_SEGMENT_ES existing
+  WHERE existing.road_segment_id = m.road_segment_id
+);
 
 -- 5. Portales. Solo se cargan los que pueden asociarse a un segmento.
 INSERT INTO GC_ADDRESS_POINT_ES (

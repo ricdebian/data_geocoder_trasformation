@@ -20,6 +20,8 @@ Cambios respecto a la versión anterior `e7b44ac`:
 - `sql/04_load_gc_es_adapter.sql` deduplica por `SOURCE_ID` antes de insertar
   en `STG_GC_LOAD_SEGMENT_MAP`, evitando violaciones de su clave primaria cuando
   el staging contiene varias filas para el mismo segmento.
+- La inserción en `GC_ROAD_SEGMENT_ES` reutiliza la misma deduplicación para no
+  insertar varias veces el mismo `ROAD_SEGMENT_ID` dentro de una sentencia.
 - `sql/03_validate_staging.sql` incluye un control específico de identificadores
   de segmento duplicados.
 
