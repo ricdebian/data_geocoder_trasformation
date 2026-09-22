@@ -22,6 +22,9 @@ Cambios respecto a la versión anterior `e7b44ac`:
   el staging contiene varias filas para el mismo segmento.
 - La inserción en `GC_ROAD_SEGMENT_ES` reutiliza la misma deduplicación para no
   insertar varias veces el mismo `ROAD_SEGMENT_ID` dentro de una sentencia.
+- Si varias filas de staging coinciden espacialmente con un segmento existente,
+  solo la primera reutiliza su ID; las demás reciben identificadores nuevos para
+  evitar otra violación de unicidad.
 - `sql/03_validate_staging.sql` incluye un control específico de identificadores
   de segmento duplicados.
 

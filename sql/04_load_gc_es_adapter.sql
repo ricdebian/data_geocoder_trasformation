@@ -270,20 +270,33 @@ source_segments AS (
   WHERE duplicate_rn = 1
 ),
 numbered AS (
-  SELECT s.source_id,
-         NVL(existing.road_segment_id,
-             NVL((SELECT MAX(road_segment_id) FROM GC_ROAD_SEGMENT_ES), 0)
-             + s.source_rn) AS new_segment_id
-  FROM source_segments s
-  JOIN STG_GC_LOAD_ROAD_MAP road_map
-    ON road_map.source_id = s.road_source_id
-  LEFT JOIN GC_ROAD_SEGMENT_ES existing
-    ON existing.road_id = road_map.road_id
-   AND NVL(existing.left_from_number, '#') = NVL(s.left_from, '#')
-   AND NVL(existing.left_to_number, '#') = NVL(s.left_to, '#')
-   AND NVL(existing.right_from_number, '#') = NVL(s.right_from, '#')
-   AND NVL(existing.right_to_number, '#') = NVL(s.right_to, '#')
-   AND SDO_EQUAL(existing.geometry, s.geom) = 'TRUE'
+  SELECT matched.source_id,
+         CASE
+           WHEN matched.existing_road_segment_id IS NOT NULL
+            AND matched.existing_rn = 1
+           THEN matched.existing_road_segment_id
+           ELSE NVL((SELECT MAX(road_segment_id) FROM GC_ROAD_SEGMENT_ES), 0)
+                + matched.source_rn
+         END AS new_segment_id
+  FROM (
+    SELECT s.source_id,
+           ROW_NUMBER() OVER (ORDER BY s.source_id) AS source_rn,
+           existing.road_segment_id AS existing_road_segment_id,
+           ROW_NUMBER() OVER (
+             PARTITION BY existing.road_segment_id
+             ORDER BY s.source_id
+           ) AS existing_rn
+    FROM source_segments s
+    JOIN STG_GC_LOAD_ROAD_MAP road_map
+      ON road_map.source_id = s.road_source_id
+    LEFT JOIN GC_ROAD_SEGMENT_ES existing
+      ON existing.road_id = road_map.road_id
+     AND NVL(existing.left_from_number, '#') = NVL(s.left_from, '#')
+     AND NVL(existing.left_to_number, '#') = NVL(s.left_to, '#')
+     AND NVL(existing.right_from_number, '#') = NVL(s.right_from, '#')
+     AND NVL(existing.right_to_number, '#') = NVL(s.right_to, '#')
+     AND SDO_EQUAL(existing.geometry, s.geom) = 'TRUE'
+  ) matched
 )
 SELECT s.source_id,
        n.new_segment_id
