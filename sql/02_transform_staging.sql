@@ -29,10 +29,57 @@ SELECT "osm_id", 'OSM', "name", "ref", "oneway", "fclass", geom
 FROM STG_OSM_ROAD
 WHERE "osm_id" IS NOT NULL AND geom IS NOT NULL;
 
+-- Redes de Transporte aporta la geometría de los tramos y relaciona los
+-- portales mediante id_tramo. Se usan identificadores prefijados para evitar
+-- colisiones con los identificadores de OSM.
+INSERT INTO STG_GC_ROAD_ES (
+  SOURCE_ID, SOURCE_NAME, NAME, CLASS_NAME
+)
+SELECT 'RT:VIAL:' || TO_CHAR("id_vial"), 'REDES_TRANSPORTE',
+       MAX("nombre"), MAX("tipo_viald")
+FROM STG_RT_TRAMO_VIAL
+WHERE "id_vial" IS NOT NULL
+GROUP BY "id_vial";
+
+-- En la convención de este ETL, los números impares se sitúan a la izquierda
+-- y los pares a la derecha siguiendo el sentido creciente del tramo. Solo se
+-- consideran números simples (con una letra opcional); valores como S/N o
+-- 3-5 no permiten establecer un rango estable y se excluyen.
+INSERT INTO STG_GC_ROAD_SEGMENT_ES (
+  SOURCE_ID, SOURCE_NAME, ROAD_SOURCE_ID,
+  LEFT_FROM, LEFT_TO, RIGHT_FROM, RIGHT_TO, GEOM
+)
+WITH portal_numbers AS (
+  SELECT "id_tramo" AS tramo_id,
+         TO_NUMBER(REGEXP_SUBSTR(TRIM("numero"), '^[0-9]+')) AS house_number
+  FROM STG_RT_PORTAL
+  WHERE "id_tramo" IS NOT NULL
+    AND REGEXP_LIKE(TRIM("numero"), '^[0-9]+[[:alpha:]]?$')
+),
+number_ranges AS (
+  SELECT tramo_id,
+         MIN(CASE WHEN MOD(house_number, 2) = 1 THEN house_number END) AS odd_from,
+         MAX(CASE WHEN MOD(house_number, 2) = 1 THEN house_number END) AS odd_to,
+         MIN(CASE WHEN MOD(house_number, 2) = 0 THEN house_number END) AS even_from,
+         MAX(CASE WHEN MOD(house_number, 2) = 0 THEN house_number END) AS even_to
+  FROM portal_numbers
+  GROUP BY tramo_id
+)
+SELECT 'RT:TRAMO:' || TO_CHAR(t."id_tramo"), 'REDES_TRANSPORTE',
+       'RT:VIAL:' || TO_CHAR(t."id_vial"),
+       TO_CHAR(r.odd_from), TO_CHAR(r.odd_to),
+       TO_CHAR(r.even_from), TO_CHAR(r.even_to),
+       t.geom
+FROM STG_RT_TRAMO_VIAL t
+LEFT JOIN number_ranges r ON r.tramo_id = t."id_tramo"
+WHERE t."id_tramo" IS NOT NULL
+  AND t.geom IS NOT NULL;
+
 -- Fallback de segmento: cuando Redes de Transporte no se ha normalizado
 -- todavía, cada geometría lineal OSM se utiliza como segmento sin rangos.
--- Si existe una transformación específica de STG_RT_*, debe sustituir este
--- bloque para aportar los rangos izquierdo/derecho reales.
+-- Los rangos izquierdo/derecho no se deben inferir asignando todos los
+-- portales de un vial a cada segmento. Si existe una transformación específica
+-- de STG_RT_*, debe cargar los rangos reales y sustituir este bloque.
 INSERT INTO STG_GC_ROAD_SEGMENT_ES (
   SOURCE_ID, SOURCE_NAME, ROAD_SOURCE_ID,
   LEFT_FROM, LEFT_TO, RIGHT_FROM, RIGHT_TO, GEOM

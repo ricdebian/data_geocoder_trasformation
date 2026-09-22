@@ -6,6 +6,9 @@ Los dos flujos de carga se conservan en directorios separados:
 - `flujo-shapefile/`: convierte previamente a Shapefile y carga desde ese formato.
 
 Cada directorio contiene su propio `README.md` y los lanzadores del flujo.
+El flujo directo es útil cuando el driver OCI de GDAL puede leer correctamente
+el GeoPackage; el flujo con Shapefile se mantiene como alternativa de
+compatibilidad.
 
 El flujo no crea manualmente las tablas oficiales `GC_*_ES`. Oracle debe crear
 esas tablas y sus índices mediante sus scripts y procedimientos propios. Estos
@@ -42,6 +45,22 @@ canónicos y ejecuta estos scripts:
 Las tablas de origen `STG_CARTO_*`, `STG_OSM_*` y `STG_RT_*` se siguen creando
 con `ogr2ogr` durante `02_load_staging.sh`, porque sus columnas dependen de la
 edición concreta de los paquetes CartoCiudad, Geofabrik y Redes de Transporte.
+
+En el flujo PowerShell directo desde GeoPackage deben configurarse las rutas de
+QGIS/GDAL, Oracle Instant Client, `GDAL_DATA`, `PROJ_DATA`,
+`GDAL_DRIVER_PATH` y `NLS_LANG`. Los detalles y las rutas de ejemplo están en
+[`flujo-directo-gpkg/README.md`](flujo-directo-gpkg/README.md).
+
+La carga OCI del flujo directo convierte los campos `DateTime` a texto con
+`-mapFieldType DateTime=String` para evitar errores de zona horaria. La
+transformación posterior convierte `fecha_modificacion` explícitamente a
+`TIMESTAMP(6)` en `STG_GC_ADDRESS_POINT_ES`.
+
+Los segmentos de Redes de Transporte calculan los rangos desde `rt_portalpk_p`
+por paridad: impares en `LEFT_FROM`/`LEFT_TO` y pares en
+`RIGHT_FROM`/`RIGHT_TO`, siguiendo el sentido creciente del tramo. Los
+segmentos generados desde OSM son un fallback geométrico y no aportan rangos.
+La validación informa de segmentos sin rango antes de la carga oficial.
 
 ## Creación del Oracle Geocoder y perfiles de idioma
 
