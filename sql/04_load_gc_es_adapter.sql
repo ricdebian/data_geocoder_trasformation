@@ -76,6 +76,7 @@ TRUNCATE TABLE STG_GC_LOAD_POSTAL_MAP;
 TRUNCATE TABLE STG_GC_LOAD_SEGMENT_MAP;
 
 -- 1. Áreas: los niveles 1-4 se derivan del tipo de área disponible en OSM.
+PROMPT INSERTANDO EN STG_GC_LOAD_AREA_MAP
 INSERT INTO STG_GC_LOAD_AREA_MAP (SOURCE_ID, AREA_ID)
 WITH source_areas AS (
   SELECT source_id, area_type, name, parent_source_id,
@@ -110,6 +111,8 @@ LEFT JOIN GC_AREA_ES existing
   ON existing.admin_level = s.admin_level
  AND UPPER(TRIM(existing.area_name)) = UPPER(TRIM(s.name));
 
+
+PROMPT INSERTANDO EN GC_AREA_ES
 INSERT INTO GC_AREA_ES (AREA_ID, PARENT_AREA_ID, AREA_NAME, ADMIN_LEVEL, SETTLEMENT_TYPE)
 SELECT m.area_id,
        parent_map.area_id,
@@ -139,8 +142,9 @@ WHERE s.source_id IS NOT NULL
     FROM GC_AREA_ES existing
     WHERE existing.area_id = m.area_id
   );
-
+commit;
 -- 2. Viales.
+PROMPT INSERTANDO EN STG_GC_LOAD_ROAD_MAP
 INSERT INTO STG_GC_LOAD_ROAD_MAP (SOURCE_ID, ROAD_ID)
 WITH source_roads AS (
   SELECT source_id, name, ref, class_name,
@@ -165,7 +169,7 @@ LEFT JOIN GC_ROAD_ES existing
   ON UPPER(TRIM(existing.road_name)) = UPPER(TRIM(s.name))
  AND NVL(UPPER(TRIM(existing.road_type)), '#') =
      NVL(UPPER(TRIM(s.class_name)), '#');
-
+PROMPT INSERTANDO EN GC_ROAD_ES
 INSERT INTO GC_ROAD_ES (ROAD_ID, ROAD_NAME, ROAD_PREFIX, ROAD_SUFFIX, ROAD_TYPE)
 SELECT m.road_id,
        SUBSTR(s.name, 1, 128),
@@ -181,8 +185,10 @@ WHERE s.source_id IS NOT NULL
     FROM GC_ROAD_ES existing
     WHERE existing.road_id = m.road_id
   );
-
+commit;
 -- 3. Códigos postales asociados al municipio cuando existe coincidencia.
+PROMPT INSERTANDO EN STG_GC_LOAD_POSTAL_MAP
+
 INSERT INTO STG_GC_LOAD_POSTAL_MAP (POSTAL_CODE, AREA_ID, POSTAL_CODE_ID)
 WITH source_postals AS (
   SELECT DISTINCT
@@ -211,6 +217,8 @@ JOIN numbered n
 LEFT JOIN GC_POSTAL_CODE_ES existing
   ON existing.postal_code = s.postal_code
  AND NVL(existing.area_id, -1) = NVL(s.area_id, -1);
+ 
+PROMPT INSERTANDO EN GC_POSTAL_CODE_ES
 
 INSERT INTO GC_POSTAL_CODE_ES (POSTAL_CODE_ID, POSTAL_CODE, AREA_ID)
 SELECT m.postal_code_id, m.postal_code, m.area_id
@@ -221,8 +229,11 @@ WHERE NOT EXISTS (
   WHERE existing.postal_code_id = m.postal_code_id
 );
 
+commit;
 -- 4. Segmentos. Si la fuente de segmentos no se ha cargado, no se generan
 -- filas: GC_ADDRESS_POINT_ES exige una relación válida con un segmento.
+PROMPT INSERTANDO EN STG_GC_LOAD_SEGMENT_MAP
+
 INSERT INTO STG_GC_LOAD_SEGMENT_MAP (SOURCE_ID, ROAD_SEGMENT_ID)
 WITH source_segments AS (
   SELECT source_id, road_source_id, left_from, left_to, right_from, right_to,
@@ -253,6 +264,9 @@ SELECT s.source_id,
 FROM source_segments s
 JOIN numbered n ON n.source_id = s.source_id
 ;
+--select * from STG_GC_LOAD_SEGMENT_MAP r
+--where r.geom.sdo_srid  <> 4258 4326
+PROMPT INSERTANDO EN GC_ROAD_SEGMENT_ES
 
 INSERT INTO GC_ROAD_SEGMENT_ES (
   ROAD_SEGMENT_ID, ROAD_ID, POSTAL_CODE_ID, AREA_ID,
@@ -266,7 +280,7 @@ SELECT m.road_segment_id,
        SUBSTR(s.left_to, 1, 16),
        SUBSTR(s.right_from, 1, 16),
        SUBSTR(s.right_to, 1, 16),
-       s.geom
+       SDO_CS.TRANSFORM(s.geom, 4326) geom
 FROM STG_GC_ROAD_SEGMENT_ES s
 JOIN STG_GC_LOAD_SEGMENT_MAP m ON m.source_id = s.source_id
 JOIN STG_GC_LOAD_ROAD_MAP road_map ON road_map.source_id = s.road_source_id
@@ -276,8 +290,10 @@ WHERE s.geom IS NOT NULL
     FROM GC_ROAD_SEGMENT_ES existing
     WHERE existing.road_segment_id = m.road_segment_id
   );
-
+commit;
 -- 5. Portales. Solo se cargan los que pueden asociarse a un segmento.
+PROMPT INSERTANDO EN GC_ADDRESS_POINT_ES
+
 INSERT INTO GC_ADDRESS_POINT_ES (
   ADDRESS_POINT_ID, ROAD_SEGMENT_ID, HOUSE_NUMBER, SIDE, PERCENT, GEOMETRY
 )
@@ -285,7 +301,7 @@ WITH candidate_addresses AS (
   SELECT a.source_id,
          segment_map.road_segment_id,
          a.house_number,
-         a.geom,
+         SDO_CS.TRANSFORM(a.geom, 4326) geom,
          ROW_NUMBER() OVER (
            PARTITION BY a.source_id
            ORDER BY segment_map.road_segment_id
@@ -319,14 +335,16 @@ SELECT NVL((SELECT MAX(address_point_id) FROM GC_ADDRESS_POINT_ES), 0)
        SUBSTR(house_number, 1, 32),
        NULL,
        NULL,
-       geom
+        SDO_CS.TRANSFORM(geom, 4326) geom
 FROM new_addresses;
-
+commit;
 -- 6. Puntos de interés. Las relaciones administrativas son opcionales en el
 -- DDL de complemento_objetos_gc_oracle.sql.
+PROMPT INSERTANDO EN GC_POI_ES
+
 INSERT INTO GC_POI_ES (POI_ID, POI_NAME, AREA_ID, POSTAL_CODE_ID, GEOMETRY)
 WITH source_pois AS (
-  SELECT p.source_id, p.name, p.geom,
+  SELECT p.source_id, p.name, SDO_CS.TRANSFORM(p.geom, 4326) geom,
          ROW_NUMBER() OVER (ORDER BY p.source_id) AS source_rn
   FROM STG_GC_POI_ES p
   WHERE p.source_id IS NOT NULL
@@ -342,12 +360,12 @@ SELECT NVL((SELECT MAX(poi_id) FROM GC_POI_ES), 0) + source_rn,
        SUBSTR(name, 1, 256),
        NULL,
        NULL,
-       geom
+        geom
 FROM source_pois;
 
 COMMIT;
 
-TRUNCATE TABLE STG_GC_LOAD_AREA_MAP;
-TRUNCATE TABLE STG_GC_LOAD_ROAD_MAP;
-TRUNCATE TABLE STG_GC_LOAD_POSTAL_MAP;
-TRUNCATE TABLE STG_GC_LOAD_SEGMENT_MAP;
+--TRUNCATE TABLE STG_GC_LOAD_AREA_MAP;
+--TRUNCATE TABLE STG_GC_LOAD_ROAD_MAP;
+--TRUNCATE TABLE STG_GC_LOAD_POSTAL_MAP;
+--TRUNCATE TABLE STG_GC_LOAD_SEGMENT_MAP;

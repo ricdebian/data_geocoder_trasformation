@@ -18,7 +18,7 @@ INSERT INTO STG_GC_ADDRESS_POINT_ES (
 )
 SELECT "id_porpk", 'CARTOCIUDAD', "tipo_vial", "nombre_via", "numero", "extension",
        "id_pob", "poblacion", LPAD("cod_postal", 5, '0'), "ine_mun", "municipio",
-       "provincia", "comunidad_autonoma", cast(to_timestamp("fecha_modificacion",'YYYY-MM-DD"T"HH24:MI:SS.FF') as timestamp(6)),geom
+       "provincia", "comunidad_autonoma",to_timestamp("fecha_modificacion",'YYYY-MM-DD"T"HH24:MI:SS.FF') ,geom
 FROM STG_CARTO_PORTAL
 WHERE "id_porpk" IS NOT NULL AND geom IS NOT NULL;
 

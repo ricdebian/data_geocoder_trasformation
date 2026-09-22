@@ -5,6 +5,41 @@ Rem ********************************************************************
 Rem #16473696: Indicate Oracle-Supplied object
 Rem @@?/rdbms/admin/sqlsessstart.sql
 Rem ********************************************************************
+INSERT INTO gc_country_profile (    country_name, country_code_3, country_code_2, 
+    lang_code_1, lang_code_2, lang_code_3, lang_code_4,
+    number_admin_levels, settlement_level, municipality_level, region_level,
+    settlement_is_optional, municipality_is_optional, region_is_optional,
+    postcode_in_settlement, settlement_as_city, cached_admin_area_level,
+    gc_table_suffix, center_long, center_lat,
+    separate_prefix, separate_suffix, separate_stype,
+    area_id, version
+) VALUES (
+    'SPAIN',                    -- country_name
+    'ESP',                      -- country_code_3 (ISO 3-letras)
+    'ES',                       -- country_code_2 (ISO 2-letras)
+    'SPA',                      -- lang_code_1 (Español / Castellano principal)
+    'CAT',                      -- lang_code_2 (Catalán - opcional, o dejar NULL)
+    'GLG',                      -- lang_code_3 (Gallego - opcional, o dejar NULL)
+    'EUS',                      -- lang_code_4 (Euskera - opcional, o dejar NULL)
+    3,                          -- number_admin_levels (Comunidad, Provincia, Municipio)
+    3,                          -- settlement_level (Nivel de asentamiento/población)
+    3,                          -- municipality_level (Nivel del municipio)
+    1,                          -- region_level (Nivel regional superior - Comunidad Autónoma)
+    'N',                        -- settlement_is_optional (Obligatorio para afinar la dirección)
+    'N',                        -- municipality_is_optional (Obligatorio en el desglose)
+    'Y',                        -- region_is_optional (La CC.AA. suele ser opcional al escribir una dirección)
+    'N',                        -- postcode_in_settlement (El código postal en España no es único por municipio)
+    'Y',                        -- settlement_as_city (Tratar el asentamiento local como la Ciudad)
+    1,                          -- cached_admin_area_level
+    'ES',                       -- gc_table_suffix (Tablas GC_ROAD_ES, etc.)
+    -3.70379,                   -- center_long (Longitud de Madrid)
+    40.41678,                   -- center_lat (Latitud de Madrid)
+    'Y',                        -- separate_prefix (Separa "Calle", "Avenida", etc.)
+    'N',                        -- separate_suffix (No suele llevar sufijos de tipo de vía al final)
+    'Y',                        -- separate_stype (Separa tipos de calle en el parseo)
+    34,                         -- area_id (Código telefónico o ID de área internacional de España)
+    '1.0'                       -- version
+);
 
 insert into gc_parser_profiles values ('AD','COUNTRY_NAME', NULL, NULL, NULL, MDSYS.SDO_KEYWORDARRAY('AD','AND','ANDORRA'));
 insert into gc_parser_profiles values ('AD','IN_LINE_STREET_TYPE_KEYWORD','P','S','CARRETERA', MDSYS.SDO_KEYWORDARRAY('CARRETERA D'||'''','CARRETERA DE L'||''''));
