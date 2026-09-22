@@ -36,6 +36,9 @@ Cambios respecto a la versión anterior `e7b44ac`:
   mapas permanecen disponibles durante el resto del proceso.
 - Esta estrategia confirma cada fase por separado; un error posterior no
   revierte las fases ya confirmadas.
+- Se resolvieron marcadores de conflicto Git que impedían ejecutar el script y
+  se completaron los `COMMIT` que faltaban tras los mapas de viales, códigos
+  postales y segmentos.
 
 ### Flujo de carga directa desde GeoPackage
 

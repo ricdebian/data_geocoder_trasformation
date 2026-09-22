@@ -158,11 +158,7 @@ WHERE s.source_id IS NOT NULL
     FROM GC_AREA_ES existing
     WHERE existing.area_id = m.area_id
   );
-<<<<<<< .mine
-commit;
-=======
 COMMIT;
->>>>>>> .theirs
 -- 2. Viales.
 PROMPT INSERTANDO EN STG_GC_LOAD_ROAD_MAP
 INSERT INTO STG_GC_LOAD_ROAD_MAP (SOURCE_ID, ROAD_ID)
@@ -189,6 +185,8 @@ LEFT JOIN GC_ROAD_ES existing
   ON UPPER(TRIM(existing.road_name)) = UPPER(TRIM(s.name))
  AND NVL(UPPER(TRIM(existing.road_type)), '#') =
      NVL(UPPER(TRIM(s.class_name)), '#');
+COMMIT;
+
 PROMPT INSERTANDO EN GC_ROAD_ES
 INSERT INTO GC_ROAD_ES (ROAD_ID, ROAD_NAME, ROAD_PREFIX, ROAD_SUFFIX, ROAD_TYPE)
 SELECT m.road_id,
@@ -205,7 +203,7 @@ WHERE s.source_id IS NOT NULL
     FROM GC_ROAD_ES existing
     WHERE existing.road_id = m.road_id
   );
-commit;
+COMMIT;
 -- 3. Códigos postales asociados al municipio cuando existe coincidencia.
 PROMPT INSERTANDO EN STG_GC_LOAD_POSTAL_MAP
 
@@ -237,6 +235,7 @@ JOIN numbered n
 LEFT JOIN GC_POSTAL_CODE_ES existing
   ON existing.postal_code = s.postal_code
  AND NVL(existing.area_id, -1) = NVL(s.area_id, -1);
+COMMIT;
  
 PROMPT INSERTANDO EN GC_POSTAL_CODE_ES
 
@@ -249,8 +248,6 @@ WHERE NOT EXISTS (
   WHERE existing.postal_code_id = m.postal_code_id
 );
 COMMIT;
-
-commit;
 -- 4. Segmentos. Si la fuente de segmentos no se ha cargado, no se generan
 -- filas: GC_ADDRESS_POINT_ES exige una relación válida con un segmento.
 PROMPT INSERTANDO EN STG_GC_LOAD_SEGMENT_MAP
@@ -309,6 +306,7 @@ SELECT s.source_id,
 FROM source_segments s
 JOIN numbered n ON n.source_id = s.source_id
 ;
+COMMIT;
 --select * from STG_GC_LOAD_SEGMENT_MAP r
 --where r.geom.sdo_srid  <> 4258 4326
 PROMPT INSERTANDO EN GC_ROAD_SEGMENT_ES
@@ -335,10 +333,9 @@ WHERE s.geom IS NOT NULL
     FROM GC_ROAD_SEGMENT_ES existing
     WHERE existing.road_segment_id = m.road_segment_id
   );
-commit;
+COMMIT;
 -- 5. Portales. Solo se cargan los que pueden asociarse a un segmento.
 PROMPT INSERTANDO EN GC_ADDRESS_POINT_ES
-COMMIT;
 
 INSERT INTO GC_ADDRESS_POINT_ES (
   ADDRESS_POINT_ID, ROAD_SEGMENT_ID, HOUSE_NUMBER, SIDE, PERCENT, GEOMETRY
@@ -383,7 +380,7 @@ SELECT NVL((SELECT MAX(address_point_id) FROM GC_ADDRESS_POINT_ES), 0)
        NULL,
         SDO_CS.TRANSFORM(geom, 4326) geom
 FROM new_addresses;
-commit;
+COMMIT;
 -- 6. Puntos de interés. Las relaciones administrativas son opcionales en el
 -- DDL de complemento_objetos_gc_oracle.sql.
 PROMPT INSERTANDO EN GC_POI_ES
@@ -409,7 +406,6 @@ SELECT NVL((SELECT MAX(poi_id) FROM GC_POI_ES), 0) + source_rn,
         geom
 FROM source_pois;
 COMMIT;
-
 COMMIT;
 
 --TRUNCATE TABLE STG_GC_LOAD_AREA_MAP;
