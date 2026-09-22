@@ -339,7 +339,7 @@ segment_addresses AS (
          a.municipality_name,
          ROW_NUMBER() OVER (
            PARTITION BY s.source_id
-           ORDER BY SDO_DISTANCE(s.geom, a.geom)
+           ORDER BY SDO_GEOM.SDO_DISTANCE(s.geom, a.geom, 0.000001)
          ) AS address_rn
   FROM source_segments s
   JOIN STG_GC_ROAD_ES source_road
@@ -454,7 +454,7 @@ poi_addresses AS (
          a.municipality_name,
          ROW_NUMBER() OVER (
            PARTITION BY p.source_id
-           ORDER BY SDO_DISTANCE(p.geom, a.geom)
+           ORDER BY SDO_GEOM.SDO_DISTANCE(p.geom, a.geom, 0.000001)
          ) AS address_rn
   FROM source_pois p
   JOIN STG_GC_ADDRESS_POINT_ES a

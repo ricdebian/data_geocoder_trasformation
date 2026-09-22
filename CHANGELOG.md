@@ -34,6 +34,10 @@ Cambios respecto a la versión anterior `e7b44ac`:
 La carga de `GC_POI_ES` aplica el mismo criterio: utiliza el portal CartoCiudad
 más próximo para resolver `AREA_ID` y `POSTAL_CODE_ID`, y valida los POI que no
 puedan relacionarse.
+
+Las búsquedas de proximidad usan `SDO_GEOM.SDO_DISTANCE` con tolerancia
+`0.000001`, que es la llamada válida al paquete Oracle para las geometrías de
+staging en EPSG:4258.
 - Solo se aceptan números simples con una letra opcional; `S/N` y rangos como
   `3-5` se excluyen por no representar un extremo estable.
 - El fallback de segmentos OSM aporta geometría, pero no rangos de numeración.
