@@ -9,6 +9,11 @@ Cambios respecto a la versión anterior `e7b44ac`:
 - Los segmentos de Redes de Transporte se incorporan a staging y sus rangos se
   calculan desde `rt_portalpk_p` por paridad: impares a la izquierda y pares a
   la derecha, siguiendo el sentido creciente del tramo.
+- El identificador de segmento de Redes de Transporte se construye con
+  `id_vial:id_tramo`, evitando que un mismo `id_tramo` repetido en vías
+  distintas comparta `SOURCE_ID` y `ROAD_SEGMENT_ID`.
+- Los rangos de portales también se agrupan por `id_vial` e `id_tramo`, para no
+  mezclar numeraciones de vías diferentes.
 - Solo se aceptan números simples con una letra opcional; `S/N` y rangos como
   `3-5` se excluyen por no representar un extremo estable.
 - El fallback de segmentos OSM aporta geometría, pero no rangos de numeración.

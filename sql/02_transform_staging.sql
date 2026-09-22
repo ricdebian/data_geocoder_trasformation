@@ -50,28 +50,33 @@ INSERT INTO STG_GC_ROAD_SEGMENT_ES (
   LEFT_FROM, LEFT_TO, RIGHT_FROM, RIGHT_TO, GEOM
 )
 WITH portal_numbers AS (
-  SELECT "id_tramo" AS tramo_id,
+  SELECT "id_vial" AS vial_id,
+         "id_tramo" AS tramo_id,
          TO_NUMBER(REGEXP_SUBSTR(TRIM("numero"), '^[0-9]+')) AS house_number
   FROM STG_RT_PORTAL
-  WHERE "id_tramo" IS NOT NULL
+  WHERE "id_vial" IS NOT NULL
+    AND "id_tramo" IS NOT NULL
     AND REGEXP_LIKE(TRIM("numero"), '^[0-9]+[[:alpha:]]?$')
 ),
 number_ranges AS (
-  SELECT tramo_id,
+  SELECT vial_id, tramo_id,
          MIN(CASE WHEN MOD(house_number, 2) = 1 THEN house_number END) AS odd_from,
          MAX(CASE WHEN MOD(house_number, 2) = 1 THEN house_number END) AS odd_to,
          MIN(CASE WHEN MOD(house_number, 2) = 0 THEN house_number END) AS even_from,
          MAX(CASE WHEN MOD(house_number, 2) = 0 THEN house_number END) AS even_to
   FROM portal_numbers
-  GROUP BY tramo_id
+  GROUP BY vial_id, tramo_id
 )
-SELECT 'RT:TRAMO:' || TO_CHAR(t."id_tramo"), 'REDES_TRANSPORTE',
+SELECT 'RT:TRAMO:' || TO_CHAR(t."id_vial") || ':' || TO_CHAR(t."id_tramo"),
+       'REDES_TRANSPORTE',
        'RT:VIAL:' || TO_CHAR(t."id_vial"),
        TO_CHAR(r.odd_from), TO_CHAR(r.odd_to),
        TO_CHAR(r.even_from), TO_CHAR(r.even_to),
        t.geom
 FROM STG_RT_TRAMO_VIAL t
-LEFT JOIN number_ranges r ON r.tramo_id = t."id_tramo"
+LEFT JOIN number_ranges r
+  ON r.vial_id = t."id_vial"
+ AND r.tramo_id = t."id_tramo"
 WHERE t."id_tramo" IS NOT NULL
   AND t.geom IS NOT NULL;
 
