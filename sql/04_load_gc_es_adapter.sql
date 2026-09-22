@@ -101,6 +101,7 @@ WITH source_areas AS (
              OR UPPER(area_type) LIKE '%REGION%' THEN 2
            WHEN UPPER(area_type) LIKE '%COUNTY%'
              OR UPPER(area_type) LIKE '%PROVINCE%' THEN 3
+           WHEN UPPER(area_type) LIKE '%ADMIN_LEVEL8%' THEN 3
            ELSE 4
          END AS admin_level,
          ROW_NUMBER() OVER (ORDER BY source_id) AS source_rn
@@ -139,6 +140,7 @@ SELECT m.area_id,
            OR UPPER(s.area_type) LIKE '%REGION%' THEN 2
          WHEN UPPER(s.area_type) LIKE '%COUNTY%'
            OR UPPER(s.area_type) LIKE '%PROVINCE%' THEN 3
+         WHEN UPPER(s.area_type) LIKE '%ADMIN_LEVEL8%' THEN 3
          ELSE 4
        END,
        CASE

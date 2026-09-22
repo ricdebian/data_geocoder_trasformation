@@ -14,6 +14,14 @@ Cambios respecto a la versión anterior `e7b44ac`:
   distintas comparta `SOURCE_ID` y `ROAD_SEGMENT_ID`.
 - Los rangos de portales también se agrupan por `id_vial` e `id_tramo`, para no
   mezclar numeraciones de vías diferentes.
+
+### Jerarquía de áreas
+
+- `STG_GC_AREA_ES.PARENT_SOURCE_ID` se calcula para las áreas OSM
+  `admin_level8/9/10` mediante contención espacial.
+- Se selecciona como padre el polígono contenedor del nivel inmediatamente
+  superior disponible y el adaptador lo carga en `PARENT_AREA_ID`.
+- La validación informa de áreas de nivel 9 o 10 que no tienen padre.
 - Solo se aceptan números simples con una letra opcional; `S/N` y rangos como
   `3-5` se excluyen por no representar un extremo estable.
 - El fallback de segmentos OSM aporta geometría, pero no rangos de numeración.

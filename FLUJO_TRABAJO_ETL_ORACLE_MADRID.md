@@ -249,6 +249,13 @@ La fuente principal será CartoCiudad. Los límites administrativos de OSM se
 pueden utilizar como apoyo, pero no deben sustituir sin control a la fuente
 oficial.
 
+En el staging OSM, las áreas `admin_level8`, `admin_level9` y `admin_level10`
+se jerarquizan mediante contención espacial. Para cada área se selecciona como
+padre el polígono contenedor con el nivel administrativo inmediatamente
+superior disponible; el identificador se guarda en `PARENT_SOURCE_ID` y el
+adaptador lo transforma en `PARENT_AREA_ID`. Las áreas sin contenedor
+disponible permanecen en el nivel raíz y deben revisarse con la validación.
+
 ### 6.2. `GC_POSTAL_CODE_ES`
 
 Construir los códigos postales y sus relaciones con municipios y áreas.

@@ -100,10 +100,42 @@ SELECT "osm_id" "osm_id", 'OSM', p."name", p."fclass",p.geom
 FROM STG_OSM_POI p
 WHERE p."osm_id" IS NOT NULL AND p.geom IS NOT NULL;
 
-INSERT INTO STG_GC_AREA_ES (SOURCE_ID, SOURCE_NAME, AREA_TYPE, NAME, GEOM)
-SELECT "osm_id", 'OSM', "fclass", "name", geom
-FROM STG_OSM_AREA
-WHERE "osm_id" IS NOT NULL AND geom IS NOT NULL;
+INSERT INTO STG_GC_AREA_ES (
+  SOURCE_ID, SOURCE_NAME, AREA_TYPE, NAME, PARENT_SOURCE_ID, GEOM
+)
+WITH area_levels AS (
+  SELECT "osm_id" AS source_id,
+         "fclass" AS area_type,
+         "name" AS area_name,
+         geom,
+         TO_NUMBER(REGEXP_SUBSTR("fclass", '[0-9]+')) AS admin_level
+  FROM STG_OSM_AREA
+  WHERE "osm_id" IS NOT NULL
+    AND geom IS NOT NULL
+),
+parent_candidates AS (
+  SELECT child.source_id,
+         parent.source_id AS parent_source_id,
+         ROW_NUMBER() OVER (
+           PARTITION BY child.source_id
+           ORDER BY parent.admin_level DESC, parent.source_id
+         ) AS parent_rn
+  FROM area_levels child
+  JOIN area_levels parent
+    ON parent.source_id <> child.source_id
+   AND parent.admin_level < child.admin_level
+   AND SDO_RELATE(parent.geom, child.geom, 'mask=CONTAINS querytype=JOIN') = 'TRUE'
+)
+SELECT child.source_id,
+       'OSM',
+       child.area_type,
+       child.area_name,
+       parent.parent_source_id,
+       child.geom
+FROM area_levels child
+LEFT JOIN parent_candidates parent
+  ON parent.source_id = child.source_id
+ AND parent.parent_rn = 1;
 
 INSERT INTO STG_GC_POSTAL_CODE_ES (
   POSTAL_CODE, MUNICIPALITY_CODE, MUNICIPALITY_NAME, SOURCE_NAME
