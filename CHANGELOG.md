@@ -28,6 +28,15 @@ Cambios respecto a la versión anterior `e7b44ac`:
 - `sql/03_validate_staging.sql` incluye un control específico de identificadores
   de segmento duplicados.
 
+### Confirmación incremental del adaptador
+
+- `sql/04_load_gc_es_adapter.sql` ejecuta `COMMIT` después de cada sentencia
+  `INSERT`, incluidos los mapas temporales y las tablas oficiales.
+- Las tablas temporales globales usan `ON COMMIT PRESERVE ROWS`, por lo que los
+  mapas permanecen disponibles durante el resto del proceso.
+- Esta estrategia confirma cada fase por separado; un error posterior no
+  revierte las fases ya confirmadas.
+
 ### Flujo de carga directa desde GeoPackage
 
 - Se documentaron los requisitos de entorno para PowerShell y QGIS/GDAL:

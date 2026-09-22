@@ -125,6 +125,7 @@ JOIN numbered n ON n.source_id = s.source_id
 LEFT JOIN GC_AREA_ES existing
   ON existing.admin_level = s.admin_level
  AND UPPER(TRIM(existing.area_name)) = UPPER(TRIM(s.name));
+COMMIT;
 
 
 PROMPT INSERTANDO EN GC_AREA_ES
@@ -157,7 +158,11 @@ WHERE s.source_id IS NOT NULL
     FROM GC_AREA_ES existing
     WHERE existing.area_id = m.area_id
   );
+<<<<<<< .mine
 commit;
+=======
+COMMIT;
+>>>>>>> .theirs
 -- 2. Viales.
 PROMPT INSERTANDO EN STG_GC_LOAD_ROAD_MAP
 INSERT INTO STG_GC_LOAD_ROAD_MAP (SOURCE_ID, ROAD_ID)
@@ -243,6 +248,7 @@ WHERE NOT EXISTS (
   FROM GC_POSTAL_CODE_ES existing
   WHERE existing.postal_code_id = m.postal_code_id
 );
+COMMIT;
 
 commit;
 -- 4. Segmentos. Si la fuente de segmentos no se ha cargado, no se generan
@@ -332,6 +338,7 @@ WHERE s.geom IS NOT NULL
 commit;
 -- 5. Portales. Solo se cargan los que pueden asociarse a un segmento.
 PROMPT INSERTANDO EN GC_ADDRESS_POINT_ES
+COMMIT;
 
 INSERT INTO GC_ADDRESS_POINT_ES (
   ADDRESS_POINT_ID, ROAD_SEGMENT_ID, HOUSE_NUMBER, SIDE, PERCENT, GEOMETRY
@@ -401,6 +408,7 @@ SELECT NVL((SELECT MAX(poi_id) FROM GC_POI_ES), 0) + source_rn,
        NULL,
         geom
 FROM source_pois;
+COMMIT;
 
 COMMIT;
 
