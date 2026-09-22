@@ -317,20 +317,67 @@ INSERT INTO GC_ROAD_SEGMENT_ES (
   ROAD_SEGMENT_ID, ROAD_ID, POSTAL_CODE_ID, AREA_ID,
   LEFT_FROM_NUMBER, LEFT_TO_NUMBER, RIGHT_FROM_NUMBER, RIGHT_TO_NUMBER, GEOMETRY
 )
+WITH ranked_source_segments AS (
+  SELECT s.*,
+         ROW_NUMBER() OVER (
+           PARTITION BY s.source_id
+           ORDER BY s.road_source_id, s.left_from, s.left_to,
+                    s.right_from, s.right_to
+         ) AS duplicate_rn
+  FROM STG_GC_ROAD_SEGMENT_ES s
+  WHERE s.source_id IS NOT NULL
+    AND s.geom IS NOT NULL
+),
+source_segments AS (
+  SELECT *
+  FROM ranked_source_segments
+  WHERE duplicate_rn = 1
+),
+segment_addresses AS (
+  SELECT s.source_id AS segment_source_id,
+         a.postal_code,
+         a.municipality_name,
+         ROW_NUMBER() OVER (
+           PARTITION BY s.source_id
+           ORDER BY SDO_DISTANCE(s.geom, a.geom)
+         ) AS address_rn
+  FROM source_segments s
+  JOIN STG_GC_ROAD_ES source_road
+    ON source_road.source_id = s.road_source_id
+  JOIN STG_GC_ADDRESS_POINT_ES a
+    ON UPPER(TRIM(source_road.name)) = UPPER(TRIM(a.street_name))
+   AND a.geom IS NOT NULL
+  WHERE a.postal_code IS NOT NULL
+    AND a.municipality_name IS NOT NULL
+),
+segment_context AS (
+  SELECT sa.segment_source_id,
+         postal.postal_code_id,
+         area.area_id
+  FROM segment_addresses sa
+  LEFT JOIN GC_AREA_ES area
+    ON area.admin_level = 3
+   AND UPPER(TRIM(area.area_name)) = UPPER(TRIM(sa.municipality_name))
+  LEFT JOIN GC_POSTAL_CODE_ES postal
+    ON postal.postal_code = sa.postal_code
+   AND NVL(postal.area_id, -1) = NVL(area.area_id, -1)
+  WHERE sa.address_rn = 1
+)
 SELECT m.road_segment_id,
        road_map.road_id,
-       NULL,
-       NULL,
+       context.postal_code_id,
+       context.area_id,
        SUBSTR(s.left_from, 1, 16),
        SUBSTR(s.left_to, 1, 16),
        SUBSTR(s.right_from, 1, 16),
        SUBSTR(s.right_to, 1, 16),
        SDO_CS.TRANSFORM(s.geom, 4326) geom
-FROM STG_GC_ROAD_SEGMENT_ES s
+FROM source_segments s
 JOIN STG_GC_LOAD_SEGMENT_MAP m ON m.source_id = s.source_id
 JOIN STG_GC_LOAD_ROAD_MAP road_map ON road_map.source_id = s.road_source_id
-WHERE s.geom IS NOT NULL
-  AND NOT EXISTS (
+LEFT JOIN segment_context context
+  ON context.segment_source_id = s.source_id
+WHERE NOT EXISTS (
     SELECT 1
     FROM GC_ROAD_SEGMENT_ES existing
     WHERE existing.road_segment_id = m.road_segment_id

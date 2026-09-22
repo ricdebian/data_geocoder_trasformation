@@ -22,6 +22,14 @@ Cambios respecto a la versión anterior `e7b44ac`:
 - Se selecciona como padre el polígono contenedor del nivel inmediatamente
   superior disponible y el adaptador lo carga en `PARENT_AREA_ID`.
 - La validación informa de áreas de nivel 9 o 10 que no tienen padre.
+
+### Relaciones de segmentos
+
+- La carga de `GC_ROAD_SEGMENT_ES` intenta asignar `AREA_ID` y
+  `POSTAL_CODE_ID` usando el portal CartoCiudad más próximo del mismo vial.
+- El municipio del portal se resuelve contra `GC_AREA_ES` y el código postal
+  contra `GC_POSTAL_CODE_ES`.
+- Se añadieron controles para detectar segmentos sin área o código postal.
 - Solo se aceptan números simples con una letra opcional; `S/N` y rangos como
   `3-5` se excluyen por no representar un extremo estable.
 - El fallback de segmentos OSM aporta geometría, pero no rangos de numeración.
