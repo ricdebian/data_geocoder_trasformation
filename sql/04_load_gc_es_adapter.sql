@@ -430,13 +430,13 @@ SELECT NVL((SELECT MAX(address_point_id) FROM GC_ADDRESS_POINT_ES), 0)
         SDO_CS.TRANSFORM(geom, 4326) geom
 FROM new_addresses;
 COMMIT;
--- 6. Puntos de interés. Las relaciones administrativas son opcionales en el
--- DDL de complemento_objetos_gc_oracle.sql.
+-- 6. Puntos de interés. Se asignan las relaciones administrativas mediante
+-- el portal CartoCiudad más próximo con código postal y municipio.
 PROMPT INSERTANDO EN GC_POI_ES
 
 INSERT INTO GC_POI_ES (POI_ID, POI_NAME, AREA_ID, POSTAL_CODE_ID, GEOMETRY)
 WITH source_pois AS (
-  SELECT p.source_id, p.name, SDO_CS.TRANSFORM(p.geom, 4326) geom,
+  SELECT p.source_id, p.name, p.geom,
          ROW_NUMBER() OVER (ORDER BY p.source_id) AS source_rn
   FROM STG_GC_POI_ES p
   WHERE p.source_id IS NOT NULL
@@ -447,13 +447,42 @@ WITH source_pois AS (
       FROM GC_POI_ES existing
       WHERE UPPER(TRIM(existing.poi_name)) = UPPER(TRIM(p.name))
     )
+),
+poi_addresses AS (
+  SELECT p.source_id AS poi_source_id,
+         a.postal_code,
+         a.municipality_name,
+         ROW_NUMBER() OVER (
+           PARTITION BY p.source_id
+           ORDER BY SDO_DISTANCE(p.geom, a.geom)
+         ) AS address_rn
+  FROM source_pois p
+  JOIN STG_GC_ADDRESS_POINT_ES a
+    ON a.geom IS NOT NULL
+   AND a.postal_code IS NOT NULL
+   AND a.municipality_name IS NOT NULL
+),
+poi_context AS (
+  SELECT pa.poi_source_id,
+         area.area_id,
+         postal.postal_code_id
+  FROM poi_addresses pa
+  LEFT JOIN GC_AREA_ES area
+    ON area.admin_level = 3
+   AND UPPER(TRIM(area.area_name)) = UPPER(TRIM(pa.municipality_name))
+  LEFT JOIN GC_POSTAL_CODE_ES postal
+    ON postal.postal_code = pa.postal_code
+   AND NVL(postal.area_id, -1) = NVL(area.area_id, -1)
+  WHERE pa.address_rn = 1
 )
 SELECT NVL((SELECT MAX(poi_id) FROM GC_POI_ES), 0) + source_rn,
        SUBSTR(name, 1, 256),
-       NULL,
-       NULL,
-        geom
-FROM source_pois;
+       context.area_id,
+       context.postal_code_id,
+       SDO_CS.TRANSFORM(p.geom, 4326) geom
+FROM source_pois p
+LEFT JOIN poi_context context
+  ON context.poi_source_id = p.source_id;
 COMMIT;
 COMMIT;
 

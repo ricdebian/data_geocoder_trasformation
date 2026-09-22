@@ -30,6 +30,10 @@ Cambios respecto a la versión anterior `e7b44ac`:
 - El municipio del portal se resuelve contra `GC_AREA_ES` y el código postal
   contra `GC_POSTAL_CODE_ES`.
 - Se añadieron controles para detectar segmentos sin área o código postal.
+
+La carga de `GC_POI_ES` aplica el mismo criterio: utiliza el portal CartoCiudad
+más próximo para resolver `AREA_ID` y `POSTAL_CODE_ID`, y valida los POI que no
+puedan relacionarse.
 - Solo se aceptan números simples con una letra opcional; `S/N` y rangos como
   `3-5` se excluyen por no representar un extremo estable.
 - El fallback de segmentos OSM aporta geometría, pero no rangos de numeración.
