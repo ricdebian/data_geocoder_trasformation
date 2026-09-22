@@ -111,7 +111,7 @@ utilizar, ya que puede variar según la versión y el proveedor de datos.
 ```text
 datos_espaciales/
 ├── CARTOCIUDAD_CALLEJERO_MADRID.zip
-├── madrid-260831-free.gpkg.zip
+├── madrid-260914-free.gpkg.zip
 └── RT_MADRID_shp.zip
 ```
 
@@ -119,7 +119,12 @@ datos_espaciales/
 
 #### Geofabrik
 
-`datos_espaciales/madrid-260831-free.gpkg.zip` contiene `madrid.gpkg`, con
+El flujo PowerShell espera `datos_espaciales/madrid-260914-free.gpkg.zip`.
+El archivo actualmente disponible en este checkout es
+`datos_espaciales/madrid-260831-free.gpkg.zip`; hay que descargar el primero
+o adaptar el nombre esperado por el script antes de ejecutar la preparación.
+
+`madrid-260831-free.gpkg.zip` contiene `madrid.gpkg`, con
 datos de OpenStreetMap actualizados hasta `2026-08-31T20:21:20Z`. El GeoPackage
 incluye, entre otras, estas capas:
 

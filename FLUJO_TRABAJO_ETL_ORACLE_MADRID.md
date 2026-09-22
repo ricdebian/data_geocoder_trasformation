@@ -277,12 +277,20 @@ Es la parte más compleja del proceso. Hay que:
   `GC_ROAD_SEGMENT_ES.GEOMETRY`; es la geometría espacial principal que utiliza
   el Geocoder.
 - Relacionar cada segmento con su vial.
-- Determinar rangos de numeración izquierda y derecha cuando estén disponibles.
+- Determinar rangos de numeración izquierda y derecha a partir de los portales
+  de Redes de Transporte: impares a la izquierda y pares a la derecha,
+  siguiendo el sentido creciente del tramo.
 - Asociar portales a segmentos.
 - Conservar la dirección o sentido geométrico del segmento cuando el modelo lo
   requiera.
 
 No se debe generar esta tabla copiando únicamente las calles de OSM.
+`sql/02_transform_staging.sql` calcula los mínimos y máximos de cada paridad
+desde `STG_RT_PORTAL` y los asigna a `STG_GC_ROAD_SEGMENT_ES`. Solo se aceptan
+números simples con una letra opcional; valores como `S/N` o `3-5` quedan fuera
+del cálculo. El fallback OSM crea geometría, pero deja los cuatro campos de
+rango a `NULL`. `sql/03_validate_staging.sql` informa de segmentos sin rango y
+de rangos parciales.
 
 En el modelo estándar, los segmentos son la única geometría espacial
 imprescindible para la resolución de direcciones. Las geometrías de portales,
