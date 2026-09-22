@@ -15,6 +15,14 @@ Cambios respecto a la versión anterior `e7b44ac`:
 - `sql/03_validate_staging.sql` informa de segmentos sin rango y de rangos
   parciales.
 
+### Carga del mapa de segmentos
+
+- `sql/04_load_gc_es_adapter.sql` deduplica por `SOURCE_ID` antes de insertar
+  en `STG_GC_LOAD_SEGMENT_MAP`, evitando violaciones de su clave primaria cuando
+  el staging contiene varias filas para el mismo segmento.
+- `sql/03_validate_staging.sql` incluye un control específico de identificadores
+  de segmento duplicados.
+
 ### Flujo de carga directa desde GeoPackage
 
 - Se documentaron los requisitos de entorno para PowerShell y QGIS/GDAL:

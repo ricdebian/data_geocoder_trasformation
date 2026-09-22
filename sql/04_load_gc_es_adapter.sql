@@ -250,13 +250,24 @@ commit;
 PROMPT INSERTANDO EN STG_GC_LOAD_SEGMENT_MAP
 
 INSERT INTO STG_GC_LOAD_SEGMENT_MAP (SOURCE_ID, ROAD_SEGMENT_ID)
-WITH source_segments AS (
+WITH ranked_source_segments AS (
   SELECT source_id, road_source_id, left_from, left_to, right_from, right_to,
          geom,
-         ROW_NUMBER() OVER (ORDER BY source_id) AS source_rn
+         ROW_NUMBER() OVER (
+           PARTITION BY source_id
+           ORDER BY road_source_id, left_from, left_to,
+                    right_from, right_to
+         ) AS duplicate_rn
   FROM STG_GC_ROAD_SEGMENT_ES
   WHERE source_id IS NOT NULL
     AND geom IS NOT NULL
+),
+source_segments AS (
+  SELECT source_id, road_source_id, left_from, left_to, right_from, right_to,
+         geom,
+         ROW_NUMBER() OVER (ORDER BY source_id) AS source_rn
+  FROM ranked_source_segments
+  WHERE duplicate_rn = 1
 ),
 numbered AS (
   SELECT s.source_id,
