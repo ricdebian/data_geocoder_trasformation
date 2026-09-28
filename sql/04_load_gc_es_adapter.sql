@@ -90,7 +90,9 @@ TRUNCATE TABLE GC_ROAD_ES;
 TRUNCATE TABLE GC_AREA_ES;
 
 
--- 1. Áreas: los niveles 1-4 se derivan del tipo de área disponible en OSM.
+-- 1. Áreas: los niveles 1-5 se derivan del tipo de área disponible en OSM.
+-- 1 = país, 2 = comunidad autónoma, 3 = provincia, 4 = municipio,
+-- 5 = población/distrito/barrio.
 PROMPT INSERTANDO EN STG_GC_LOAD_AREA_MAP
 INSERT INTO STG_GC_LOAD_AREA_MAP (SOURCE_ID, AREA_ID)
 WITH source_areas AS (
@@ -101,8 +103,8 @@ WITH source_areas AS (
              OR UPPER(area_type) LIKE '%REGION%' THEN 2
            WHEN UPPER(area_type) LIKE '%COUNTY%'
              OR UPPER(area_type) LIKE '%PROVINCE%' THEN 3
-           WHEN UPPER(area_type) LIKE '%ADMIN_LEVEL8%' THEN 3
-           ELSE 4
+           WHEN UPPER(area_type) LIKE '%ADMIN_LEVEL8%' THEN 4
+           ELSE 5
          END AS admin_level,
          ROW_NUMBER() OVER (ORDER BY source_id) AS source_rn
   FROM (
@@ -140,8 +142,8 @@ SELECT m.area_id,
            OR UPPER(s.area_type) LIKE '%REGION%' THEN 2
          WHEN UPPER(s.area_type) LIKE '%COUNTY%'
            OR UPPER(s.area_type) LIKE '%PROVINCE%' THEN 3
-         WHEN UPPER(s.area_type) LIKE '%ADMIN_LEVEL8%' THEN 3
-         ELSE 4
+         WHEN UPPER(s.area_type) LIKE '%ADMIN_LEVEL8%' THEN 4
+         ELSE 5
        END,
        CASE
          WHEN UPPER(s.area_type) LIKE '%CITY%'
@@ -216,7 +218,7 @@ WITH source_postals AS (
          area.area_id
   FROM STG_GC_ADDRESS_POINT_ES a
   LEFT JOIN GC_AREA_ES area
-    ON area.admin_level = 3
+    ON area.admin_level = 4
    AND UPPER(TRIM(area.area_name)) = UPPER(TRIM(a.municipality_name))
   WHERE a.postal_code IS NOT NULL
 ),
@@ -356,7 +358,7 @@ segment_context AS (
          area.area_id
   FROM segment_addresses sa
   LEFT JOIN GC_AREA_ES area
-    ON area.admin_level = 3
+    ON area.admin_level = 4
    AND UPPER(TRIM(area.area_name)) = UPPER(TRIM(sa.municipality_name))
   LEFT JOIN GC_POSTAL_CODE_ES postal
     ON postal.postal_code = sa.postal_code
@@ -468,7 +470,7 @@ poi_context AS (
          postal.postal_code_id
   FROM poi_addresses pa
   LEFT JOIN GC_AREA_ES area
-    ON area.admin_level = 3
+    ON area.admin_level = 4
    AND UPPER(TRIM(area.area_name)) = UPPER(TRIM(pa.municipality_name))
   LEFT JOIN GC_POSTAL_CODE_ES postal
     ON postal.postal_code = pa.postal_code

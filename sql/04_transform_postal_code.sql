@@ -29,7 +29,7 @@ WITH postal_points AS (
     COUNT(*) AS address_point_count
   FROM STG_GC_ADDRESS_POINT_ES a
   LEFT JOIN GC_AREA_ES municipality
-    ON municipality.admin_level = 3
+    ON municipality.admin_level = 4
    AND UPPER(TRIM(municipality.area_name)) =
        UPPER(TRIM(a.municipality_name))
   WHERE a.postal_code IS NOT NULL
